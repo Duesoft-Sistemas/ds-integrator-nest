@@ -22,7 +22,7 @@ import { AuthGuard } from './auth/auth.guard';
             database: process.env.DATABASE_NAME,
             entities: [`${__dirname}/database/core/**/*.entity{.js,.ts}`],
             migrations: [`${__dirname}/migration/{.ts,*.js}`],
-            synchronize: true,
+            synchronize: true, // remover em produção
         }),
         AuthModule,
         UsersModule,
