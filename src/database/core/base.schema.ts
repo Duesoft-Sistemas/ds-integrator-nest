@@ -23,5 +23,5 @@ export class BaseSchema {
 
     @OneToOne(() => User)
     @JoinColumn({ name: 'user_id' })
-    user: User;
+    user!: User;
 }
