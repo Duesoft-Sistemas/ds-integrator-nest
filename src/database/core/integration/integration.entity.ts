@@ -1,6 +1,6 @@
 import { Column, Entity, ManyToMany } from 'typeorm';
 import { BaseSchema } from '../base.schema';
-import { Client } from '../client/client.entity';
+import { Client } from '../clients/clients.entity';
 
 @Entity({ name: 'integrations' })
 export class Integration extends BaseSchema {

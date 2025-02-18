@@ -8,10 +8,10 @@ export class Client extends BaseSchema {
     @Column()
     name: string;
 
-    @Column()
+    @Column({ unique: true })
     cnpj: string;
 
-    @Column({ name: 'is_active' })
+    @Column({ name: 'is_active', default: true })
     isActive: boolean;
 
     @ManyToMany(() => Integration, (integration) => integration.clients)

@@ -6,6 +6,7 @@ import { UsersModule } from './users/users.module';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthGuard } from './auth/auth.guard';
+import { ClientsModule } from './clients/clients.module';
 
 @Module({
     imports: [
@@ -26,6 +27,7 @@ import { AuthGuard } from './auth/auth.guard';
         }),
         AuthModule,
         UsersModule,
+        ClientsModule,
     ],
     controllers: [AppController],
     providers: [{ provide: 'APP_GUARD', useClass: AuthGuard }, AppService],

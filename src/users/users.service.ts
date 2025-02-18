@@ -1,9 +1,9 @@
 import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
-import { User } from '../database/core/users/users.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CreateUserDto } from './users.dtos';
 import { Payload } from 'src/auth/auth.dtos';
+import { User } from '@entities/users/users.entity';
 
 @Injectable()
 export class UsersService {
@@ -28,6 +28,7 @@ export class UsersService {
             isAdmin: true,
             user: userRegister,
         });
+
         return await this.usersRepository.save(user);
     }
 
