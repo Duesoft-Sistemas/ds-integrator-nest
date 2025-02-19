@@ -1,6 +1,6 @@
-import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import { ConflictException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { IsNull, Repository } from 'typeorm';
 import { CreateUserDto } from './users.dtos';
 import { Payload } from 'src/auth/auth.dtos';
 import { User } from '@entities/users/users.entity';
@@ -10,7 +10,10 @@ export class UsersService {
     constructor(@InjectRepository(User) private usersRepository: Repository<User>) {}
 
     async findByEmail(email: string): Promise<User | null> {
-        return await this.usersRepository.findOneBy({ email, isActive: true });
+        return await this.usersRepository.findOne({
+            where: { email, deletedAt: IsNull() },
+            relations: ['client'],
+        });
     }
 
     async createAdmin(data: CreateUserDto, userRegister: Payload): Promise<User> {
@@ -36,17 +39,5 @@ export class UsersService {
 
         user = this.usersRepository.create({ ...data, user: userRegister });
         return await this.usersRepository.save(user);
-    }
-
-    async profile(id: number): Promise<Partial<User>> {
-        const user = await this.usersRepository.findOneBy({ id });
-
-        if (!user) {
-            throw new NotFoundException('Usuário não encontrado');
-        }
-
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        const { password, ...result } = user;
-        return result;
     }
 }

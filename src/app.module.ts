@@ -8,6 +8,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthGuard } from './auth/auth.guard';
 import { ClientsModule } from './clients/clients.module';
 import { IntegrationsModule } from './integrations/integrations.module';
+import { CryptoModule } from './crypto/crypto.module';
 
 @Module({
     imports: [
@@ -30,6 +31,7 @@ import { IntegrationsModule } from './integrations/integrations.module';
         UsersModule,
         ClientsModule,
         IntegrationsModule,
+        CryptoModule,
     ],
     controllers: [AppController],
     providers: [{ provide: 'APP_GUARD', useClass: AuthGuard }, AppService],

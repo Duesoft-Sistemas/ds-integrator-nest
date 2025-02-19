@@ -1,6 +1,6 @@
-import { Column, Entity, ManyToMany } from 'typeorm';
+import { Column, Entity, OneToMany } from 'typeorm';
 import { BaseSchema } from '../base.schema';
-import { Client } from '../clients/clients.entity';
+import { ClientIntegrations } from '@entities/clients/client.integrations.entity';
 
 @Entity({ name: 'integrations' })
 export class Integration extends BaseSchema {
@@ -10,6 +10,6 @@ export class Integration extends BaseSchema {
     @Column({ nullable: true })
     photo?: string;
 
-    @ManyToMany(() => Client, (client) => client.integrations, { cascade: true })
-    clients: Client[];
+    @OneToMany(() => ClientIntegrations, (clientIntegration) => clientIntegration.integration)
+    clientIntegrations: ClientIntegrations[];
 }

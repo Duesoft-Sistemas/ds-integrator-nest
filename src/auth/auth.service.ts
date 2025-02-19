@@ -1,8 +1,10 @@
+import * as _ from 'lodash';
 import * as bcrypt from 'bcrypt';
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { UsersService } from 'src/users/users.service';
 import { JwtService } from '@nestjs/jwt';
 import { jwtConstants } from './constants';
+import { Payload } from './auth.dtos';
 
 @Injectable()
 export class AuthService {
@@ -18,8 +20,8 @@ export class AuthService {
             throw new UnauthorizedException('Credenciais inválidas');
         }
 
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        const { password: pass, ...payload } = user;
+        const payload: Payload = { ..._.omit(user, 'password', 'client') };
+        payload.isClient = user.client != null;
 
         const access_token = await this.jwtService.signAsync(payload, {
             expiresIn: '1d', // 300s
@@ -31,6 +33,6 @@ export class AuthService {
             secret: jwtConstants.refreshSecret,
         });
 
-        return { access_token, refresh_token };
+        return { access_token, refresh_token, user: payload };
     }
 }

@@ -1,6 +1,7 @@
+import { Client } from '@entities/clients/clients.entity';
 import * as bcrypt from 'bcrypt';
 import { BaseSchema } from 'src/database/core/base.schema';
-import { BeforeInsert, BeforeUpdate, Column, Entity } from 'typeorm';
+import { BeforeInsert, BeforeUpdate, Column, Entity, OneToOne } from 'typeorm';
 
 @Entity({ name: 'users' })
 export class User extends BaseSchema {
@@ -22,12 +23,13 @@ export class User extends BaseSchema {
     @Column({ nullable: true })
     photo!: string;
 
+    @OneToOne(() => Client, (client) => client.profile, { nullable: true })
+    client?: Client;
+
     @BeforeInsert()
     @BeforeUpdate()
     async hashPassword() {
-        if (this.password) {
-            const salt = await bcrypt.genSalt(10);
-            this.password = await bcrypt.hash(this.password, salt);
-        }
+        const salt = await bcrypt.genSalt(10);
+        this.password = await bcrypt.hash(this.password, salt);
     }
 }

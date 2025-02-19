@@ -1,7 +1,7 @@
-import { Column, Entity, JoinColumn, JoinTable, ManyToMany, OneToOne } from 'typeorm';
+import { Column, Entity, JoinColumn, OneToMany, OneToOne } from 'typeorm';
 import { BaseSchema } from '../base.schema';
-import { Integration } from '../integration/integration.entity';
 import { User } from '../users/users.entity';
+import { ClientIntegrations } from './client.integrations.entity';
 
 @Entity({ name: 'clients' })
 export class Client extends BaseSchema {
@@ -14,11 +14,13 @@ export class Client extends BaseSchema {
     @Column({ name: 'is_active', default: true })
     isActive: boolean;
 
-    @ManyToMany(() => Integration, (integration) => integration.clients)
-    @JoinTable({ name: 'client_integrations' })
-    integrations: Integration[];
+    @Column()
+    profile_id: number;
 
-    @OneToOne(() => User)
+    @OneToOne(() => User, { onDelete: 'CASCADE' })
     @JoinColumn({ name: 'profile_id' })
     profile: User;
+
+    @OneToMany(() => ClientIntegrations, (entity) => entity.client, { cascade: true })
+    integrations: ClientIntegrations[];
 }

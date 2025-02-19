@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, Req } from '@nestjs/common';
+import { Body, Controller, Post, Req } from '@nestjs/common';
 import { CreateUserDto } from './users.dtos';
 import { UsersService } from './users.service';
 import { Request } from 'express';
@@ -15,10 +15,5 @@ export class UsersController {
     @Post()
     async createUser(@Req() req: Request, @Body() data: CreateUserDto) {
         return await this.usersService.create(data, req.user);
-    }
-
-    @Get('profile')
-    async getProfile(@Req() req: Request) {
-        return await this.usersService.profile(req.user.id);
     }
 }
