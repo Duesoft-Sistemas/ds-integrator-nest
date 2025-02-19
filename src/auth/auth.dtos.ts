@@ -1,11 +1,7 @@
+import { User } from '@entities/users/users.entity';
 import { IsEmail, IsNotEmpty } from 'class-validator';
 
-export class Payload {
-    id: number;
-    email: string;
-    username!: string;
-    isAdmin: boolean;
-}
+export class Payload extends User {}
 
 export class SignInDto {
     @IsEmail()

@@ -1,7 +1,6 @@
 import * as bcrypt from 'bcrypt';
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { UsersService } from 'src/users/users.service';
-import { Payload } from './auth.dtos';
 import { JwtService } from '@nestjs/jwt';
 import { jwtConstants } from './constants';
 
@@ -19,15 +18,11 @@ export class AuthService {
             throw new UnauthorizedException('Credenciais inválidas');
         }
 
-        const payload: Payload = {
-            email,
-            id: user.id,
-            username: user.name,
-            isAdmin: user.isAdmin,
-        };
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const { password: pass, ...payload } = user;
 
         const access_token = await this.jwtService.signAsync(payload, {
-            expiresIn: '300s',
+            expiresIn: '1d', // 300s
             secret: jwtConstants.secret,
         });
 

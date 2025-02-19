@@ -8,7 +8,7 @@ import { IsNull, Not, Repository } from 'typeorm';
 export class ClientsService {
     constructor(@InjectRepository(Client) private readonly clientRepository: Repository<Client>) {}
 
-    async create(data: CreateClientDto) {
+    async create(data: CreateClientDto): Promise<Client> {
         const { cnpj, name, integrations, profile } = data;
         let client = await this.clientRepository.findOneBy({ cnpj });
 
@@ -20,7 +20,7 @@ export class ClientsService {
         return await this.clientRepository.save(client);
     }
 
-    async update(data: UpdateClientDto) {
+    async update(data: UpdateClientDto): Promise<void> {
         const { id, cnpj, name, integrations } = data;
 
         if (!(await this.clientRepository.findOneBy({ id }))) {
@@ -31,7 +31,7 @@ export class ClientsService {
             throw new ConflictException(`Cliente com CNPJ ${cnpj} já registrado`);
         }
 
-        return await this.clientRepository.update(id, { cnpj, name, integrations });
+        await this.clientRepository.update(id, { cnpj, name, integrations });
     }
 
     async delete(data: DeleteClientDto): Promise<void> {
@@ -41,7 +41,7 @@ export class ClientsService {
             throw new NotFoundException('Cliente não encontrado');
         }
 
-        await this.clientRepository.delete(id);
+        await this.clientRepository.update(id, { deletedAt: new Date() });
     }
 
     async list(): Promise<Client[]> {
