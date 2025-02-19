@@ -1,4 +1,4 @@
-import { IsInt, IsNotEmpty, IsOptional } from 'class-validator';
+import { IsNotEmpty, IsOptional } from 'class-validator';
 
 export class CreateIntegrationDto {
     @IsNotEmpty()
@@ -9,8 +9,3 @@ export class CreateIntegrationDto {
 }
 
 export class UpdateIntegrationDto extends CreateIntegrationDto {}
-
-export class DeleteIntegrationDto {
-    @IsInt()
-    id: number;
-}

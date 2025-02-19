@@ -1,7 +1,6 @@
-import { Integration } from '@entities/integration/integration.entity';
-import { User } from '@entities/users/users.entity';
-import { OmitType } from '@nestjs/swagger';
-import { IsInt, IsNotEmpty } from 'class-validator';
+import { Type } from 'class-transformer';
+import { ArrayMinSize, IsArray, IsInt, IsNotEmpty, ValidateNested } from 'class-validator';
+import { CreateUserDto } from 'src/users/users.dtos';
 
 export class CreateClientDto {
     @IsNotEmpty()
@@ -10,17 +9,17 @@ export class CreateClientDto {
     @IsNotEmpty()
     cnpj: string;
 
-    @IsNotEmpty()
-    integrations: Integration[];
+    @IsArray()
+    @ArrayMinSize(1, { message: 'Informe ao menos uma integração' })
+    integrations: number[];
 
     @IsNotEmpty()
-    profile: User;
+    @ValidateNested()
+    @Type(() => CreateUserDto)
+    profile: CreateUserDto;
 }
 
-export class UpdateClientDto extends OmitType(CreateClientDto, ['profile']) {
-    @IsInt()
-    id: number;
-}
+export class UpdateClientDto extends CreateClientDto {}
 
 export class DeleteClientDto {
     @IsInt()

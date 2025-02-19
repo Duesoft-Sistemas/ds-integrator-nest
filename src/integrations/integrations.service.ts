@@ -1,12 +1,8 @@
 import { Integration } from '@entities/integration/integration.entity';
 import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { IsNull, Repository } from 'typeorm';
-import {
-    CreateIntegrationDto,
-    DeleteIntegrationDto,
-    UpdateIntegrationDto,
-} from './integrations.dtos';
+import { In, Repository } from 'typeorm';
+import { CreateIntegrationDto, UpdateIntegrationDto } from './integrations.dtos';
 import { Payload } from 'src/auth/auth.dtos';
 
 @Injectable()
@@ -17,7 +13,7 @@ export class IntegrationsService {
     ) {}
 
     async create(data: CreateIntegrationDto, user: Payload): Promise<Integration> {
-        const { name, photo } = data;
+        const { name } = data;
 
         const where = 'LOWER(unaccent(integrations.name)) LIKE LOWER(unaccent(:name))';
         let integration = await this.integrationRepository
@@ -29,12 +25,13 @@ export class IntegrationsService {
             throw new ConflictException(`Integração ${integration.name} já registrado`);
         }
 
-        integration = this.integrationRepository.create({ name, user, photo });
+        integration = this.integrationRepository.create({ ...data, user });
         return await this.integrationRepository.save(integration);
     }
 
     async update(id: number, data: UpdateIntegrationDto): Promise<void> {
-        const { name, photo } = data;
+        const { name } = data;
+
         let integration = await this.integrationRepository.findOneBy({ id });
 
         if (!integration) {
@@ -49,23 +46,27 @@ export class IntegrationsService {
             .getOne();
 
         if (integration) {
-            throw new ConflictException(`Integração ${name} já registrado`);
+            throw new ConflictException(`Integração ${integration.name} já registrado`);
         }
 
-        await this.integrationRepository.update(id, { name, photo });
+        await this.integrationRepository.update(id, data);
     }
 
-    async delete(data: DeleteIntegrationDto) {
-        const { id } = data;
+    async delete(id: number) {
+        const integration = await this.integrationRepository.findOneBy({ id });
 
-        if (!(await this.integrationRepository.findOneBy({ id }))) {
+        if (!integration) {
             throw new NotFoundException('Integração não encontrado');
         }
 
-        await this.integrationRepository.update(id, { deletedAt: new Date() });
+        await this.integrationRepository.delete(id);
     }
 
     async list(): Promise<Integration[]> {
-        return await this.integrationRepository.findBy({ deletedAt: IsNull() });
+        return await this.integrationRepository.find();
+    }
+
+    async listByIds(ids: number[]): Promise<Integration[]> {
+        return await this.integrationRepository.findBy({ id: In(ids) });
     }
 }

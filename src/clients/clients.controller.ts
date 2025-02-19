@@ -1,19 +1,21 @@
-import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Put } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Put, Req } from '@nestjs/common';
 import { CreateClientDto, DeleteClientDto, UpdateClientDto } from './clients.dtos';
 import { ClientsService } from './clients.service';
+import { Request } from 'express';
 
 @Controller('clients')
 export class ClientsController {
     constructor(private readonly clientsService: ClientsService) {}
 
     @Post()
-    async createClient(@Body() data: CreateClientDto) {
-        return await this.clientsService.create(data);
+    async createClient(@Req() req: Request, @Body() data: CreateClientDto) {
+        const { user } = req;
+        return await this.clientsService.create(data, user);
     }
 
     @Put(':id')
-    async updateClient(@Body() data: UpdateClientDto, @Param('id', ParseIntPipe) id: number) {
-        return await this.clientsService.update({ ...data, id });
+    async updateClient(@Param('id', ParseIntPipe) id: number, @Body() data: UpdateClientDto) {
+        return await this.clientsService.update(id, data);
     }
 
     @Delete(':id')

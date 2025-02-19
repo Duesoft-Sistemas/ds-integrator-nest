@@ -14,33 +14,27 @@ export class UsersService {
     }
 
     async createAdmin(data: CreateUserDto, userRegister: Payload): Promise<User> {
-        const { email, name, password } = data;
+        const { email } = data;
         let user = await this.findByEmail(email);
 
         if (user) {
             throw new ConflictException(`O e-mail ${user.email} já existe`);
         }
 
-        user = this.usersRepository.create({
-            email,
-            name,
-            password,
-            isAdmin: true,
-            user: userRegister,
-        });
+        user = this.usersRepository.create({ ...data, user: userRegister });
 
         return await this.usersRepository.save(user);
     }
 
     async create(data: CreateUserDto, userRegister: Payload): Promise<User> {
-        const { email, name, password } = data;
+        const { email } = data;
         let user = await this.findByEmail(email);
 
         if (user) {
             throw new ConflictException(`O e-mail ${user.email} já existe`);
         }
 
-        user = this.usersRepository.create({ email, name, password, user: userRegister });
+        user = this.usersRepository.create({ ...data, user: userRegister });
         return await this.usersRepository.save(user);
     }
 

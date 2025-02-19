@@ -10,6 +10,6 @@ export class Integration extends BaseSchema {
     @Column({ nullable: true })
     photo?: string;
 
-    @ManyToMany(() => Client, (client) => client.integrations)
+    @ManyToMany(() => Client, (client) => client.integrations, { cascade: true })
     clients: Client[];
 }

@@ -8,5 +8,6 @@ import { Integration } from '@entities/integration/integration.entity';
     imports: [TypeOrmModule.forFeature([Integration])],
     controllers: [IntegrationsController],
     providers: [IntegrationsService],
+    exports: [IntegrationsService],
 })
 export class IntegrationsModule {}

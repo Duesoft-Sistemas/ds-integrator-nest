@@ -1,9 +1,10 @@
 import { User } from 'src/database/core/users/users.entity';
 import {
+    Column,
     CreateDateColumn,
     DeleteDateColumn,
     JoinColumn,
-    OneToOne,
+    ManyToOne,
     PrimaryGeneratedColumn,
     UpdateDateColumn,
 } from 'typeorm';
@@ -21,7 +22,10 @@ export class BaseSchema {
     @DeleteDateColumn({ name: 'deleted_at', type: 'timestamptz' })
     deletedAt!: Date;
 
-    @OneToOne(() => User)
+    @Column({ name: 'user_id', nullable: true })
+    user_id?: number;
+
+    @ManyToOne(() => User, { nullable: true })
     @JoinColumn({ name: 'user_id' })
-    user!: User;
+    user?: User;
 }

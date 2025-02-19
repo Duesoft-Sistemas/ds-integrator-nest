@@ -12,11 +12,7 @@ import {
     UseInterceptors,
 } from '@nestjs/common';
 import { IntegrationsService } from './integrations.service';
-import {
-    CreateIntegrationDto,
-    DeleteIntegrationDto,
-    UpdateIntegrationDto,
-} from './integrations.dtos';
+import { CreateIntegrationDto, UpdateIntegrationDto } from './integrations.dtos';
 import { Request } from 'express';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
@@ -87,8 +83,8 @@ export class IntegrationsController {
     }
 
     @Delete(':id')
-    async deleteIntegration(@Param() data: DeleteIntegrationDto) {
-        return await this.integrationsService.delete(data);
+    async deleteIntegration(@Param('id', ParseIntPipe) id: number) {
+        return await this.integrationsService.delete(id);
     }
 
     @Get()
