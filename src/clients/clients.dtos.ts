@@ -1,9 +1,12 @@
+import { Transform } from 'class-transformer';
 import {
     ArrayMinSize,
     IsArray,
+    IsBoolean,
     IsEmail,
     IsInt,
     IsNotEmpty,
+    IsOptional,
     IsString,
     Matches,
 } from 'class-validator';
@@ -29,6 +32,14 @@ export class CreateClientDto {
 export class UpdateClientDto extends CreateClientDto {}
 
 export class DeleteClientDto {
+    @Transform(({ value }) => Number.parseInt(value))
     @IsInt()
     id: number;
+}
+
+export class ListClientDto {
+    @Transform(({ value }) => value === 'true')
+    @IsBoolean()
+    @IsOptional()
+    only_active?: boolean = false;
 }

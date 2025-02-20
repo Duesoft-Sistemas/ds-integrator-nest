@@ -1,5 +1,16 @@
-import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Put, Req } from '@nestjs/common';
-import { CreateClientDto, DeleteClientDto, UpdateClientDto } from './clients.dtos';
+import {
+    Body,
+    Controller,
+    Delete,
+    Get,
+    Param,
+    ParseIntPipe,
+    Post,
+    Put,
+    Query,
+    Req,
+} from '@nestjs/common';
+import { CreateClientDto, DeleteClientDto, ListClientDto, UpdateClientDto } from './clients.dtos';
 import { ClientsService } from './clients.service';
 import { Request } from 'express';
 
@@ -24,7 +35,7 @@ export class ClientsController {
     }
 
     @Get()
-    async listClients() {
-        return await this.clientsService.list();
+    async listClients(@Query() data: ListClientDto) {
+        return await this.clientsService.list(data);
     }
 }

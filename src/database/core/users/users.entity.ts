@@ -29,7 +29,9 @@ export class User extends BaseSchema {
     @BeforeInsert()
     @BeforeUpdate()
     async hashPassword() {
-        const salt = await bcrypt.genSalt(10);
-        this.password = await bcrypt.hash(this.password, salt);
+        if (this.password) {
+            const salt = await bcrypt.genSalt(10);
+            this.password = await bcrypt.hash(this.password, salt);
+        }
     }
 }

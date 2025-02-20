@@ -1,7 +1,7 @@
 import { Integration } from '@entities/integration/integration.entity';
 import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { In, Repository } from 'typeorm';
+import { In, IsNull, Repository } from 'typeorm';
 import { CreateIntegrationDto, UpdateIntegrationDto } from './integrations.dtos';
 import { Payload } from 'src/auth/auth.dtos';
 
@@ -67,6 +67,6 @@ export class IntegrationsService {
     }
 
     async listByIds(ids: number[]): Promise<Integration[]> {
-        return await this.integrationRepository.findBy({ id: In(ids) });
+        return await this.integrationRepository.findBy({ id: In(ids), deletedAt: IsNull() });
     }
 }

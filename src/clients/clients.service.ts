@@ -9,9 +9,15 @@ import {
 } from '@nestjs/common';
 import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
 import { Payload } from 'src/auth/auth.dtos';
-import { CreateClientDto, DeleteClientDto, UpdateClientDto } from 'src/clients/clients.dtos';
+import {
+    CreateClientDto,
+    DeleteClientDto,
+    ListClientDto,
+    UpdateClientDto,
+} from 'src/clients/clients.dtos';
 import { CryptoService } from 'src/crypto/crypto.service';
-import { DataSource, IsNull, Not, Repository } from 'typeorm';
+import { DataSource, In, IsNull, Not, Repository } from 'typeorm';
+import { ClientIntegrations } from '@entities/clients/client.integrations.entity';
 
 @Injectable()
 export class ClientsService {
@@ -38,25 +44,19 @@ export class ClientsService {
         await queryRunner.startTransaction();
 
         try {
-            const userToCreate = { user, email, password, name: data.name };
-            const userProfile = queryRunner.manager.create(User, userToCreate);
-            await queryRunner.manager.save(userProfile);
+            const userToCreate = { user, email, password, name: data.name.split(' ')[0] };
+            const profile = queryRunner.manager.create(User, userToCreate);
+            await queryRunner.manager.save(profile);
 
-            const clientToCreate = {
-                ...rest,
-                user_id: user.id,
-                profile_id: userProfile.id,
-                integrations: integrationIds.map((integration_id) => ({
-                    integration_id,
-                })),
-            };
+            const integrations = integrationIds.map((id) => ({ integration_id: id }));
+            const clientToCreate = { ...rest, user, profile, integrations };
+
             client = queryRunner.manager.create(Client, clientToCreate);
             await queryRunner.manager.save(client);
 
             await queryRunner.commitTransaction();
-
             return {
-                ..._.omit(client, 'integrations'),
+                ..._.omit(client, 'user', 'profile', 'integrations'),
                 password: passwordEncrypted,
             };
         } catch (ex) {
@@ -70,8 +70,8 @@ export class ClientsService {
         }
     }
 
-    async update(id: number, data: UpdateClientDto): Promise<void> {
-        const { email, integrations: integrationIds, ...rest } = data;
+    async update(id: number, data: UpdateClientDto): Promise<Partial<Client>> {
+        const { integrations: integrationIds } = data;
 
         let client = await this.clientRepository.findOne({
             where: { id: Not(id), cnpj: data.cnpj },
@@ -81,7 +81,10 @@ export class ClientsService {
             throw new ConflictException(`Cliente com CNPJ ${client.cnpj} já registrado`);
         }
 
-        client = await this.clientRepository.findOneBy({ id, deletedAt: IsNull() });
+        client = await this.clientRepository.findOne({
+            where: { id, deletedAt: IsNull() },
+            relations: ['profile', 'integrations'],
+        });
 
         if (!client) {
             throw new NotFoundException('Cliente não encontrado');
@@ -92,14 +95,22 @@ export class ClientsService {
         await queryRunner.startTransaction();
 
         try {
-            const profileToUpdate = queryRunner.manager.update(User, client.profile_id, { email });
-            await queryRunner.manager.save(profileToUpdate);
+            const integrationsToDelete = client.integrations;
 
-            const clientToUpdate = queryRunner.manager.update(Client, client.id, {
-                ...rest,
-                integrations: integrationIds.map((integration_id) => ({ integration_id })),
-            });
-            await queryRunner.manager.save(clientToUpdate);
+            client.cnpj = data.cnpj;
+            client.name = data.name;
+            client.profile.name = data.name;
+            client.profile.email = data.email;
+            client.integrations = integrationIds.map((id) => ({
+                integration_id: id,
+            })) as ClientIntegrations[];
+
+            await queryRunner.manager.delete(ClientIntegrations, integrationsToDelete);
+            await queryRunner.manager.save(client);
+            await queryRunner.manager.save(client.profile);
+
+            await queryRunner.commitTransaction();
+            return _.omit(client, 'profile', 'integrations');
         } catch (ex) {
             await queryRunner.rollbackTransaction();
 
@@ -114,7 +125,11 @@ export class ClientsService {
     async delete(data: DeleteClientDto): Promise<void> {
         const { id } = data;
 
-        const client = await this.clientRepository.findOneBy({ id });
+        const client = await this.clientRepository.findOne({
+            where: { id },
+            relations: ['profile'],
+        });
+
         if (!client) {
             throw new NotFoundException('Cliente não encontrado');
         }
@@ -124,17 +139,13 @@ export class ClientsService {
         await queryRunner.startTransaction();
 
         try {
-            const profileToUpdate = queryRunner.manager.update(User, client.profile_id, {
-                isActive: false,
-                deletedAt: new Date(),
-            });
-            await queryRunner.manager.save(profileToUpdate);
+            client.isActive = false;
+            client.deletedAt = new Date();
+            client.profile.isActive = false;
+            client.profile.deletedAt = new Date();
 
-            const clientToUpdate = queryRunner.manager.update(Client, client.id, {
-                isActive: false,
-                deletedAt: new Date(),
-            });
-            await queryRunner.manager.save(clientToUpdate);
+            await queryRunner.manager.save(client);
+            await queryRunner.manager.save(client.profile);
 
             await queryRunner.commitTransaction();
         } catch (ex) {
@@ -150,8 +161,13 @@ export class ClientsService {
         await this.clientRepository.update(id, { deletedAt: new Date(), isActive: false });
     }
 
-    async list(): Promise<Client[]> {
-        return await this.clientRepository.findBy({ deletedAt: IsNull() });
+    async list(data: ListClientDto): Promise<Client[]> {
+        const { only_active } = data;
+
+        return await this.clientRepository.findBy({
+            deletedAt: IsNull(),
+            isActive: only_active || In([true, false]),
+        });
     }
 
     async findByUser(userId: number): Promise<Client> {
