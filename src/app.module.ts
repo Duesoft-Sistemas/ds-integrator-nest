@@ -9,6 +9,7 @@ import { ClientsModule } from './clients/clients.module';
 import { IntegrationsModule } from './integrations/integrations.module';
 import { CryptoModule } from './crypto/crypto.module';
 import { DatabaseModule } from './database/databse.module';
+import { IntegrationHistoryModule } from './integration-history/integration-history.module';
 
 @Module({
     imports: [
@@ -19,6 +20,7 @@ import { DatabaseModule } from './database/databse.module';
         ClientsModule,
         IntegrationsModule,
         CryptoModule,
+        IntegrationHistoryModule,
     ],
     controllers: [AppController],
     providers: [{ provide: 'APP_GUARD', useClass: AuthGuard }, AppService],

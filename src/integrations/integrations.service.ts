@@ -1,7 +1,7 @@
 import { Integration } from '@entities/integration/integration.entity';
 import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { In, Repository } from 'typeorm';
+import { Not, Repository } from 'typeorm';
 import { CreateIntegrationDto, UpdateIntegrationDto } from './integrations.dtos';
 import { Payload } from 'src/auth/auth.dtos';
 
@@ -13,13 +13,7 @@ export class IntegrationsService {
     ) {}
 
     async create(data: CreateIntegrationDto, user: Payload): Promise<Integration> {
-        const { name } = data;
-
-        const where = 'LOWER(unaccent(integrations.name)) LIKE LOWER(unaccent(:name))';
-        let integration = await this.integrationRepository
-            .createQueryBuilder('integrations')
-            .where(where, { name })
-            .getOne();
+        let integration = await this.integrationRepository.findOneBy({ key: data.key });
 
         if (integration) {
             throw new ConflictException(`Integração ${integration.name} já registrado`);
@@ -30,20 +24,16 @@ export class IntegrationsService {
     }
 
     async update(id: number, data: UpdateIntegrationDto): Promise<void> {
-        const { name } = data;
-
         let integration = await this.integrationRepository.findOneBy({ id });
 
         if (!integration) {
             throw new NotFoundException('Integração não encontrado');
         }
 
-        const where =
-            'integrations.id <> :id AND LOWER(unaccent(integrations.name)) LIKE LOWER(unaccent(:name))';
-        integration = await this.integrationRepository
-            .createQueryBuilder('integrations')
-            .where(where, { id, name })
-            .getOne();
+        integration = await this.integrationRepository.findOneBy({
+            id: Not(id),
+            key: data.key,
+        });
 
         if (integration) {
             throw new ConflictException(`Integração ${integration.name} já registrado`);
@@ -64,9 +54,5 @@ export class IntegrationsService {
 
     async list(): Promise<Integration[]> {
         return await this.integrationRepository.find();
-    }
-
-    async listByIds(ids: number[]): Promise<Integration[]> {
-        return await this.integrationRepository.findBy({ id: In(ids) });
     }
 }

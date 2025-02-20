@@ -1,7 +1,7 @@
 import { Column, Entity, JoinColumn, OneToOne } from 'typeorm';
 import { IntegrationHistoryType } from './type.enum';
-import { Integration } from '../integration/integration.entity';
 import { BaseSchema } from '../base.schema';
+import { ClientIntegrations } from '@entities/clients/client.integrations.entity';
 
 @Entity({ name: 'integration_history' })
 export class IntegrationHistory extends BaseSchema {
@@ -15,7 +15,7 @@ export class IntegrationHistory extends BaseSchema {
     message: string;
 
     @Column({ type: 'jsonb', name: 'old_object', nullable: true })
-    oldObject!: Record<string, any>;
+    oldObject?: Record<string, any>;
 
     @Column({ type: 'jsonb', name: 'new_object' })
     newObject: Record<string, any>;
@@ -23,10 +23,10 @@ export class IntegrationHistory extends BaseSchema {
     @Column({ default: false })
     resolved: boolean;
 
-    @OneToOne(() => Integration)
-    @JoinColumn({ name: 'integration_id' })
-    integration: Integration;
+    @Column({ name: 'client_integration_id' })
+    clientIntegrationId: number;
 
-    // @Column()
-    // client: Client;
+    @OneToOne(() => ClientIntegrations)
+    @JoinColumn({ name: 'client_integration_id' })
+    integration: ClientIntegrations;
 }
