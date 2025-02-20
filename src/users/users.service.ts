@@ -4,10 +4,20 @@ import { IsNull, Repository } from 'typeorm';
 import { CreateUserDto } from './users.dtos';
 import { Payload } from 'src/auth/auth.dtos';
 import { User } from '@entities/users/users.entity';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class UsersService {
-    constructor(@InjectRepository(User) private usersRepository: Repository<User>) {}
+    constructor(
+        private readonly configService: ConfigService,
+        @InjectRepository(User) private usersRepository: Repository<User>,
+    ) {}
+
+    validDevice(deviceId: string): boolean {
+        const deviceAuthorized = this.configService.get<string>('APP_DEVICE_ID');
+
+        return !!deviceId && !!deviceAuthorized && deviceAuthorized == deviceId;
+    }
 
     async findByEmail(email: string): Promise<User | null> {
         return await this.usersRepository.findOne({
@@ -17,8 +27,7 @@ export class UsersService {
     }
 
     async createAdmin(data: CreateUserDto, userRegister: Payload): Promise<User> {
-        const { email } = data;
-        let user = await this.findByEmail(email);
+        let user = await this.findByEmail(data.email);
 
         if (user) {
             throw new ConflictException(`O e-mail ${user.email} já existe`);

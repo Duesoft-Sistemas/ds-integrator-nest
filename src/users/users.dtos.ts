@@ -10,3 +10,8 @@ export class CreateUserDto {
     @IsNotEmpty()
     password: string;
 }
+
+export class CreateUserAdminDto extends CreateUserDto {
+    @IsNotEmpty({ message: 'identificação deve ser informado' })
+    device_id: string;
+}
