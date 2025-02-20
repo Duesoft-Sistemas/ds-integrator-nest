@@ -1,6 +1,6 @@
 import { ConflictException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { IsNull, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { CreateUserDto } from './users.dtos';
 import { Payload } from 'src/auth/auth.dtos';
 import { User } from '@entities/users/users.entity';
@@ -21,7 +21,7 @@ export class UsersService {
 
     async findByEmail(email: string): Promise<User | null> {
         return await this.usersRepository.findOne({
-            where: { email, deletedAt: IsNull() },
+            where: { email },
             relations: ['client'],
         });
     }

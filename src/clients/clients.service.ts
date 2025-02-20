@@ -16,7 +16,7 @@ import {
     UpdateClientDto,
 } from 'src/clients/clients.dtos';
 import { CryptoService } from 'src/crypto/crypto.service';
-import { DataSource, In, IsNull, Not, Repository } from 'typeorm';
+import { DataSource, In, Not, Repository } from 'typeorm';
 import { ClientIntegrations } from '@entities/clients/client.integrations.entity';
 
 @Injectable()
@@ -82,7 +82,7 @@ export class ClientsService {
         }
 
         client = await this.clientRepository.findOne({
-            where: { id, deletedAt: IsNull() },
+            where: { id },
             relations: ['profile', 'integrations'],
         });
 
@@ -164,10 +164,7 @@ export class ClientsService {
     async list(data: ListClientDto): Promise<Client[]> {
         const { only_active } = data;
 
-        return await this.clientRepository.findBy({
-            deletedAt: IsNull(),
-            isActive: only_active || In([true, false]),
-        });
+        return await this.clientRepository.findBy({ isActive: only_active || In([true, false]) });
     }
 
     async findByUser(userId: number): Promise<Client> {
