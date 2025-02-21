@@ -16,7 +16,7 @@ import {
     UpdateClientDto,
 } from 'src/clients/clients.dtos';
 import { CryptoService } from 'src/crypto/crypto.service';
-import { DataSource, In, Not } from 'typeorm';
+import { DataSource, Not, Raw } from 'typeorm';
 import { ClientIntegrations } from '@entities/clients/client.integrations.entity';
 import { ClientRepository } from './clients.repository';
 import { UserRepository } from 'src/users/users.repository';
@@ -167,6 +167,6 @@ export class ClientsService {
     async list(data: ListClientDto): Promise<Client[]> {
         const { only_active } = data;
 
-        return await this.clientRepository.findBy({ isActive: only_active || In([true, false]) });
+        return await this.clientRepository.findBy({ isActive: only_active || Raw(() => 'true') });
     }
 }
