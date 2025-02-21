@@ -4,6 +4,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Not, Repository } from 'typeorm';
 import { CreateIntegrationDto, UpdateIntegrationDto } from './integrations.dtos';
 import { Payload } from 'src/auth/auth.dtos';
+import { IntegrationKey } from '@entities/integration/integration.key.enum';
 
 @Injectable()
 export class IntegrationsService {
@@ -54,5 +55,15 @@ export class IntegrationsService {
 
     async list(): Promise<Integration[]> {
         return await this.integrationRepository.find();
+    }
+
+    async findByKey(key: IntegrationKey): Promise<Integration> {
+        const integration = await this.integrationRepository.findOneBy({ key });
+
+        if (!integration) {
+            throw new NotFoundException(`Integração ${key} não encontrado`);
+        }
+
+        return integration;
     }
 }

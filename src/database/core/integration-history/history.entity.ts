@@ -1,18 +1,22 @@
 import { Column, Entity, JoinColumn, OneToOne } from 'typeorm';
-import { IntegrationHistoryType } from './type.enum';
+import { IntegrationHistoryType } from './history.type.enum';
 import { BaseSchema } from '../base.schema';
 import { ClientIntegrations } from '@entities/clients/client.integrations.entity';
+import { IntegrationHistoryProcess } from './history.process.enum';
 
 @Entity({ name: 'integration_history' })
 export class IntegrationHistory extends BaseSchema {
     @Column({ type: 'enum', enum: IntegrationHistoryType })
     type: IntegrationHistoryType;
 
-    @Column()
+    @Column({ type: 'enum', enum: IntegrationHistoryProcess })
     process: string;
 
     @Column()
-    message: string;
+    operation: string;
+
+    @Column()
+    message?: string;
 
     @Column({ type: 'jsonb', name: 'old_object', nullable: true })
     oldObject?: Record<string, any>;

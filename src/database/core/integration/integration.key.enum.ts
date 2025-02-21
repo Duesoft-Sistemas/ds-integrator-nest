@@ -8,4 +8,7 @@ export enum IntegrationKey {
     correios = 'Correios',
     bling = 'Bling',
     mercos = 'Mercos',
+    espelhamento = 'Espelhamento',
+    prideMenu = 'Pridemenu',
+    prideCommerce = 'Pridecommerce',
 }
