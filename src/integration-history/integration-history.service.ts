@@ -1,8 +1,8 @@
 import { IntegrationHistory } from '@entities/integration-history/history.entity';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { CreateHistoryDto, CreateHistoryParamsDto } from './integration-history.dtos';
+import { Raw, Repository } from 'typeorm';
+import { CreateHistoryDto, HistoryParamsDto, ListHistoryDto } from './integration-history.dtos';
 import { ClientRepository } from 'src/clients/clients.repository';
 import { Payload } from 'src/auth/auth.dtos';
 
@@ -16,7 +16,7 @@ export class IntegrationHistoryService {
 
     async create(
         user: Payload,
-        params: CreateHistoryParamsDto,
+        params: HistoryParamsDto,
         data: CreateHistoryDto,
     ): Promise<Partial<IntegrationHistory>> {
         const { clientId, integrationKey } = params;
@@ -31,5 +31,21 @@ export class IntegrationHistoryService {
         register.clientIntegrationId = integration.id;
 
         return await this.historyRepository.save(register);
+    }
+
+    async list(params: HistoryParamsDto, data: ListHistoryDto) {
+        const { clientId, integrationKey } = params;
+
+        const integration = await this.clientRepository.findIntegrationFromClient(
+            clientId,
+            integrationKey,
+        );
+
+        return await this.historyRepository.find({
+            where: {
+                clientIntegrationId: integration.id,
+                type: data.type || Raw(() => 'true'),
+            },
+        });
     }
 }

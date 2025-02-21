@@ -4,7 +4,7 @@ import { IntegrationKey } from '@entities/integration/integration.key.enum';
 import { Transform } from 'class-transformer';
 import { IsEnum, IsNotEmpty, IsNumber, IsObject, IsOptional, IsString } from 'class-validator';
 
-export class CreateHistoryParamsDto {
+export class HistoryParamsDto {
     @Transform(({ value }) => Number.parseInt(value))
     @IsNumber()
     @IsNotEmpty()
@@ -13,6 +13,12 @@ export class CreateHistoryParamsDto {
     @IsNotEmpty()
     @IsEnum(IntegrationKey)
     integrationKey: IntegrationKey;
+}
+
+export class ListHistoryDto {
+    @IsOptional()
+    @IsEnum(IntegrationHistoryType)
+    type: IntegrationHistoryType;
 }
 
 export class CreateHistoryDto {
