@@ -1,4 +1,4 @@
-import { Column, Entity, JoinColumn, OneToOne } from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
 import { IntegrationHistoryType } from './history.type.enum';
 import { BaseSchema } from '../base.schema';
 import { ClientIntegrations } from '@entities/clients/client.integrations.entity';
@@ -15,7 +15,7 @@ export class IntegrationHistory extends BaseSchema {
     @Column()
     operation: string;
 
-    @Column()
+    @Column({ nullable: true })
     message?: string;
 
     @Column({ type: 'jsonb', name: 'old_object', nullable: true })
@@ -30,7 +30,7 @@ export class IntegrationHistory extends BaseSchema {
     @Column({ name: 'client_integration_id' })
     clientIntegrationId: number;
 
-    @OneToOne(() => ClientIntegrations)
+    @ManyToOne(() => ClientIntegrations)
     @JoinColumn({ name: 'client_integration_id' })
     integration: ClientIntegrations;
 }

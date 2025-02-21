@@ -8,7 +8,7 @@ export class CreateHistoryParamsDto {
     @Transform(({ value }) => Number.parseInt(value))
     @IsNumber()
     @IsNotEmpty()
-    clienId: number;
+    clientId: number;
 
     @IsNotEmpty()
     @IsEnum(IntegrationKey)

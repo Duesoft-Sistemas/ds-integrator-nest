@@ -4,6 +4,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CreateHistoryDto, CreateHistoryParamsDto } from './integration-history.dtos';
 import { ClientRepository } from 'src/clients/clients.repository';
+import { Payload } from 'src/auth/auth.dtos';
 
 @Injectable()
 export class IntegrationHistoryService {
@@ -14,17 +15,21 @@ export class IntegrationHistoryService {
     ) {}
 
     async create(
+        user: Payload,
         params: CreateHistoryParamsDto,
         data: CreateHistoryDto,
-    ): Promise<IntegrationHistory> {
-        const { clienId, integrationKey } = params;
+    ): Promise<Partial<IntegrationHistory>> {
+        const { clientId, integrationKey } = params;
 
         const integration = await this.clientRepository.findIntegrationFromClient(
-            clienId,
+            clientId,
             integrationKey,
         );
 
-        const register = this.historyRepository.create({ ...data, integration });
+        const register = this.historyRepository.create(data);
+        register.user_id = user.id;
+        register.clientIntegrationId = integration.id;
+
         return await this.historyRepository.save(register);
     }
 }

@@ -19,7 +19,7 @@ export class ClientRepository extends Repository<Client> {
             .leftJoinAndSelect('client.integrations', 'clientIntegrations')
             .leftJoinAndSelect('clientIntegrations.integration', 'integration')
             .where(
-                'client.isActive = :isActive AND integration.isActive = :isActive AND client.id = :clientId AND integration.key = :integrationKey',
+                'client.isActive = :isActive AND clientIntegrations.isActive = :isActive AND client.id = :clientId AND integration.key = :integrationKey',
                 { clientId, integrationKey, isActive: true },
             )
             .select(['client', 'clientIntegrations']);
