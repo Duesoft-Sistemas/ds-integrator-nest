@@ -32,4 +32,12 @@ export class ClientRepository extends Repository<Client> {
 
         return register.integrations[0];
     }
+
+    async findByCnpj(cnpj: string): Promise<Client | null> {
+        return await this.findOne({ where: { cnpj }, relations: ['profile', 'integrations'] });
+    }
+
+    async findById(id: number): Promise<Client | null> {
+        return await this.findOne({ where: { id }, relations: ['profile', 'integrations'] });
+    }
 }

@@ -30,7 +30,7 @@ export class IntegrationHistory extends BaseSchema {
     @Column({ name: 'client_integration_id' })
     clientIntegrationId: number;
 
-    @ManyToOne(() => ClientIntegrations)
+    @ManyToOne(() => ClientIntegrations, { onDelete: 'CASCADE' })
     @JoinColumn({ name: 'client_integration_id' })
     integration: ClientIntegrations;
 }

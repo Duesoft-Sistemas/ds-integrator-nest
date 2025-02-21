@@ -4,7 +4,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Not, Repository } from 'typeorm';
 import { CreateIntegrationDto, UpdateIntegrationDto } from './integrations.dtos';
 import { Payload } from 'src/auth/auth.dtos';
-import { IntegrationKey } from '@entities/integration/integration.key.enum';
 
 @Injectable()
 export class IntegrationsService {
@@ -20,7 +19,9 @@ export class IntegrationsService {
             throw new ConflictException(`Integração ${integration.name} já registrado`);
         }
 
-        integration = this.integrationRepository.create({ ...data, user });
+        integration = this.integrationRepository.create(data);
+        integration.user_id = user.id;
+
         return await this.integrationRepository.save(integration);
     }
 
@@ -37,7 +38,7 @@ export class IntegrationsService {
         });
 
         if (integration) {
-            throw new ConflictException(`Integração ${integration.name} já registrado`);
+            throw new ConflictException(`Integração ${integration.key} já registrado`);
         }
 
         await this.integrationRepository.update(id, data);
@@ -55,15 +56,5 @@ export class IntegrationsService {
 
     async list(): Promise<Integration[]> {
         return await this.integrationRepository.find();
-    }
-
-    async findByKey(key: IntegrationKey): Promise<Integration> {
-        const integration = await this.integrationRepository.findOneBy({ key });
-
-        if (!integration) {
-            throw new NotFoundException(`Integração ${key} não encontrado`);
-        }
-
-        return integration;
     }
 }

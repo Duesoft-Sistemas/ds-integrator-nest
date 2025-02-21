@@ -7,7 +7,7 @@ import {
     InternalServerErrorException,
     NotFoundException,
 } from '@nestjs/common';
-import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
+import { InjectDataSource } from '@nestjs/typeorm';
 import { Payload } from 'src/auth/auth.dtos';
 import {
     CreateClientDto,
@@ -16,24 +16,33 @@ import {
     UpdateClientDto,
 } from 'src/clients/clients.dtos';
 import { CryptoService } from 'src/crypto/crypto.service';
-import { DataSource, In, Not, Repository } from 'typeorm';
+import { DataSource, In, Not } from 'typeorm';
 import { ClientIntegrations } from '@entities/clients/client.integrations.entity';
+import { ClientRepository } from './clients.repository';
+import { UserRepository } from 'src/users/users.repository';
 
 @Injectable()
 export class ClientsService {
     constructor(
         @InjectDataSource() private readonly dataSource: DataSource,
-        @InjectRepository(Client) private readonly clientRepository: Repository<Client>,
+        private readonly userRepository: UserRepository,
+        private readonly clientRepository: ClientRepository,
         private readonly cryptoService: CryptoService,
     ) {}
 
     async create(data: CreateClientDto, user: Payload): Promise<Client | { password: any }> {
         const { email, integrations: integrationIds, ...rest } = data;
 
-        let client = await this.clientRepository.findOneBy({ cnpj: data.cnpj });
+        let client = await this.clientRepository.findByCnpj(data.cnpj);
 
         if (client) {
             throw new ConflictException(`Cliente com CNPJ ${client.cnpj} já registrado`);
+        }
+
+        let profile = await this.userRepository.findByEmail(email);
+
+        if (profile) {
+            throw new ConflictException(`E-mail ${email} já registrado`);
         }
 
         const password = this.cryptoService.generatePassword();
@@ -44,21 +53,21 @@ export class ClientsService {
         await queryRunner.startTransaction();
 
         try {
-            const userToCreate = { user, email, password, name: data.name.split(' ')[0] };
-            const profile = queryRunner.manager.create(User, userToCreate);
+            profile = queryRunner.manager.create(User, { email, password });
+            profile.name = data.name;
+            profile.user_id = user.id;
             await queryRunner.manager.save(profile);
 
-            const integrations = integrationIds.map((id) => ({ integration_id: id }));
-            const clientToCreate = { ...rest, user, profile, integrations };
-
-            client = queryRunner.manager.create(Client, clientToCreate);
+            client = queryRunner.manager.create(Client, rest);
+            client.user_id = user.id;
+            client.profile_id = profile.id;
+            client.integrations = integrationIds.map((id) => ({
+                integration_id: id,
+            })) as ClientIntegrations[];
             await queryRunner.manager.save(client);
 
             await queryRunner.commitTransaction();
-            return {
-                ..._.omit(client, 'user', 'profile', 'integrations'),
-                password: passwordEncrypted,
-            };
+            return { ..._.omit(client, 'integrations'), password: passwordEncrypted };
         } catch (ex) {
             await queryRunner.rollbackTransaction();
 
@@ -81,10 +90,7 @@ export class ClientsService {
             throw new ConflictException(`Cliente com CNPJ ${client.cnpj} já registrado`);
         }
 
-        client = await this.clientRepository.findOne({
-            where: { id },
-            relations: ['profile', 'integrations'],
-        });
+        client = await this.clientRepository.findById(id);
 
         if (!client) {
             throw new NotFoundException('Cliente não encontrado');
@@ -125,10 +131,7 @@ export class ClientsService {
     async delete(data: DeleteClientDto): Promise<void> {
         const { id } = data;
 
-        const client = await this.clientRepository.findOne({
-            where: { id },
-            relations: ['profile'],
-        });
+        const client = await this.clientRepository.findById(id);
 
         if (!client) {
             throw new NotFoundException('Cliente não encontrado');
@@ -165,9 +168,5 @@ export class ClientsService {
         const { only_active } = data;
 
         return await this.clientRepository.findBy({ isActive: only_active || In([true, false]) });
-    }
-
-    async findByUser(userId: number): Promise<Client> {
-        return await this.clientRepository.findOneByOrFail({ user_id: userId });
     }
 }
