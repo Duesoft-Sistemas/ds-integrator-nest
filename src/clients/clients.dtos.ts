@@ -43,3 +43,10 @@ export class ListClientDto {
     @IsOptional()
     only_active?: boolean = false;
 }
+
+export class FindClientDto {
+    @IsString()
+    @IsNotEmpty()
+    @Matches(/^\d{14}$/, { message: 'deve conter 14 dígitos numéricos' })
+    cnpj: string;
+}

@@ -12,6 +12,7 @@ import { Payload } from 'src/auth/auth.dtos';
 import {
     CreateClientDto,
     DeleteClientDto,
+    FindClientDto,
     ListClientDto,
     UpdateClientDto,
 } from 'src/clients/clients.dtos';
@@ -168,5 +169,15 @@ export class ClientsService {
         const { only_active } = data;
 
         return await this.clientRepository.findBy({ isActive: only_active || Raw(() => 'true') });
+    }
+
+    async findByCnpj(data: FindClientDto): Promise<Client> {
+        const { cnpj } = data;
+
+        const client = await this.clientRepository.findByCnpj(cnpj);
+
+        if (!client) throw new NotFoundException(`Cliente com CNPJ ${cnpj} não encontrado`);
+
+        return client;
     }
 }

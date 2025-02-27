@@ -6,7 +6,7 @@ import { BeforeInsert, BeforeUpdate, Column, Entity, OneToOne } from 'typeorm';
 @Entity({ name: 'users' })
 export class User extends BaseSchema {
     @Column({ nullable: true })
-    name!: string;
+    name: string;
 
     @Column({ unique: true })
     email: string;

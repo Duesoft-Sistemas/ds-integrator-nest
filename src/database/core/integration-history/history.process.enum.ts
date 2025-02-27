@@ -3,7 +3,7 @@ export enum IntegrationHistoryProcess {
     invoice = 'INVOICE',
     product = 'PRODUCT',
     payment = 'PAYMENT_METHOD',
-    productCategory = 'PRODUCT_CATEGORY',
+    category = 'PRODUCT_CATEGORY',
     order = 'ORDER',
     store = 'STORE',
 }

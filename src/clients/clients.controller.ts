@@ -10,7 +10,13 @@ import {
     Query,
     Req,
 } from '@nestjs/common';
-import { CreateClientDto, DeleteClientDto, ListClientDto, UpdateClientDto } from './clients.dtos';
+import {
+    CreateClientDto,
+    DeleteClientDto,
+    FindClientDto,
+    ListClientDto,
+    UpdateClientDto,
+} from './clients.dtos';
 import { ClientsService } from './clients.service';
 import { Request } from 'express';
 
@@ -37,5 +43,10 @@ export class ClientsController {
     @Get()
     async listClients(@Query() data: ListClientDto) {
         return await this.clientsService.list(data);
+    }
+
+    @Get(':cnpj')
+    async FindClient(@Param() params: FindClientDto) {
+        return await this.clientsService.findByCnpj(params);
     }
 }
