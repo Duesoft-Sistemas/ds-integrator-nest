@@ -1,7 +1,6 @@
 import { IntegrationHistoryProcess } from '@entities/integration-history/history.process.enum';
 import { IntegrationHistoryType } from '@entities/integration-history/history.type.enum';
-import { IntegrationKey } from '@entities/integration/integration.key.enum';
-import { Transform } from 'class-transformer';
+import { Expose, Transform } from 'class-transformer';
 import { IsEnum, IsNotEmpty, IsNumber, IsObject, IsOptional, IsString } from 'class-validator';
 
 export class HistoryParamsDto {
@@ -10,9 +9,10 @@ export class HistoryParamsDto {
     @IsNotEmpty()
     clientId: number;
 
+    @Transform(({ value }) => Number.parseInt(value))
+    @IsNumber()
     @IsNotEmpty()
-    @IsEnum(IntegrationKey)
-    integrationKey: IntegrationKey;
+    integrationId: number;
 }
 
 export class ListHistoryDto {
@@ -38,9 +38,11 @@ export class CreateHistoryDto {
 
     @IsObject()
     @IsOptional()
+    @Expose({ name: 'old_object' })
     oldObject?: Record<string, any>;
 
     @IsObject()
     @IsNotEmpty()
+    @Expose({ name: 'new_object' })
     newObject: Record<string, any>;
 }

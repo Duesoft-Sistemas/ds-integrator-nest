@@ -19,11 +19,11 @@ export class IntegrationHistoryService {
         params: HistoryParamsDto,
         data: CreateHistoryDto,
     ): Promise<Partial<IntegrationHistory>> {
-        const { clientId, integrationKey } = params;
+        const { clientId, integrationId } = params;
 
         const integration = await this.clientRepository.findIntegrationFromClient(
             clientId,
-            integrationKey,
+            integrationId,
         );
 
         const register = this.historyRepository.create(data);
@@ -34,11 +34,11 @@ export class IntegrationHistoryService {
     }
 
     async list(params: HistoryParamsDto, data: ListHistoryDto) {
-        const { clientId, integrationKey } = params;
+        const { clientId, integrationId } = params;
 
         const integration = await this.clientRepository.findIntegrationFromClient(
             clientId,
-            integrationKey,
+            integrationId,
         );
 
         return await this.historyRepository.find({

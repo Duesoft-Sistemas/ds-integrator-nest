@@ -24,7 +24,7 @@ export class AuthService {
         const plainPayload = instanceToPlain(payload);
 
         const access_token = await this.jwtService.signAsync(plainPayload, {
-            expiresIn: '1d', // 300s
+            expiresIn: '1d',
             secret: jwtConstants.secret,
         });
 

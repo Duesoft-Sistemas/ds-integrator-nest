@@ -7,7 +7,7 @@ import { Request } from 'express';
 export class IntegrationHistoryController {
     constructor(private readonly historyService: IntegrationHistoryService) {}
 
-    @Post(':integrationKey/:clientId')
+    @Post(':integrationId/:clientId')
     async createHistory(
         @Req() req: Request,
         @Param() params: HistoryParamsDto,
@@ -17,7 +17,7 @@ export class IntegrationHistoryController {
         return await this.historyService.create(user, params, data);
     }
 
-    @Get(':integrationKey/:clientId')
+    @Get(':integrationId/:clientId')
     async listHistory(@Param() params: HistoryParamsDto, @Query() query: ListHistoryDto) {
         return await this.historyService.list(params, query);
     }
