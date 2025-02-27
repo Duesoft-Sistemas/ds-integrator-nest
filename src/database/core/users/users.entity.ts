@@ -1,5 +1,6 @@
 import { Client } from '@entities/clients/clients.entity';
 import * as bcrypt from 'bcrypt';
+import { Expose } from 'class-transformer';
 import { BaseSchema } from 'src/database/core/base.schema';
 import { BeforeInsert, BeforeUpdate, Column, Entity, OneToOne } from 'typeorm';
 
@@ -14,9 +15,11 @@ export class User extends BaseSchema {
     @Column()
     password: string;
 
+    @Expose({ name: 'is_active' })
     @Column({ name: 'is_active', default: true })
     isActive: boolean;
 
+    @Expose({ name: 'is_admin' })
     @Column({ name: 'is_admin', default: false })
     isAdmin: boolean;
 
