@@ -1,6 +1,5 @@
 import { IntegrationHistory } from '@entities/integration-history/history.entity';
 import { Injectable } from '@nestjs/common';
-import { Raw } from 'typeorm';
 import { CreateHistoryDto, HistoryParamsDto, ListHistoryDto } from './integration-history.dtos';
 import { ClientRepository } from 'src/clients/clients.repository';
 import { Payload } from 'src/auth/auth.dtos';
