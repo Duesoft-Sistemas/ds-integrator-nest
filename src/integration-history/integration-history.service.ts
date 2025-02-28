@@ -10,12 +10,14 @@ import { ClientRepository } from 'src/clients/clients.repository';
 import { Payload } from 'src/auth/auth.dtos';
 import { IntegrationHistoryType } from '@entities/integration-history/history.type.enum';
 import { IntegrationHistoryRepository } from './integration-history.repository';
+import { IntegrationMappingService } from 'src/integration-mapping/integration-mapping.service';
 
 @Injectable()
 export class IntegrationHistoryService {
     constructor(
         private readonly clientRepository: ClientRepository,
         private readonly historyRepository: IntegrationHistoryRepository,
+        private readonly mappingService: IntegrationMappingService,
     ) {}
 
     async create(
@@ -52,13 +54,16 @@ export class IntegrationHistoryService {
         return await this.historyRepository.listByType(IntegrationHistoryType.error);
     }
 
-    async getError(data: ErrorDetailsDto): Promise<IntegrationHistory> {
+    async getError(data: ErrorDetailsDto): Promise<IntegrationHistory & { data: Array<any> }> {
         const { id } = data;
 
         const register = await this.historyRepository.findOneBy({ id });
 
         if (!register) throw new NotFoundException(`Registro de histórico ID ${id} não encontrado`);
 
-        return register;
+        const { entity, newObject, oldObject } = register;
+        const dataMapped = await this.mappingService.mapEntity(entity, newObject, oldObject);
+
+        return { ...register, data: dataMapped };
     }
 }
