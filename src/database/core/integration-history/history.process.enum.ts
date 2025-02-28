@@ -1,4 +1,4 @@
-export enum IntegrationHistoryProcess {
+export enum IntegrationHistoryEntity {
     client = 'CLIENT',
     invoice = 'INVOICE',
     product = 'PRODUCT',

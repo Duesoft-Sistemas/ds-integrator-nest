@@ -2,15 +2,15 @@ import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
 import { IntegrationHistoryType } from './history.type.enum';
 import { BaseSchema } from '../base.schema';
 import { ClientIntegrations } from '@entities/clients/client.integrations.entity';
-import { IntegrationHistoryProcess } from './history.process.enum';
+import { IntegrationHistoryEntity } from './history.process.enum';
 
 @Entity({ name: 'integration_history' })
 export class IntegrationHistory extends BaseSchema {
     @Column({ type: 'enum', enum: IntegrationHistoryType })
     type: IntegrationHistoryType;
 
-    @Column({ type: 'enum', enum: IntegrationHistoryProcess })
-    process: string;
+    @Column({ type: 'enum', enum: IntegrationHistoryEntity })
+    entity: IntegrationHistoryEntity;
 
     @Column()
     operation: string;

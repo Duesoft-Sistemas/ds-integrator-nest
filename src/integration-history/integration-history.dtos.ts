@@ -1,4 +1,4 @@
-import { IntegrationHistoryProcess } from '@entities/integration-history/history.process.enum';
+import { IntegrationHistoryEntity } from '@entities/integration-history/history.process.enum';
 import { IntegrationHistoryType } from '@entities/integration-history/history.type.enum';
 import { Expose, Transform } from 'class-transformer';
 import { IsEnum, IsNotEmpty, IsNumber, IsObject, IsOptional, IsString } from 'class-validator';
@@ -25,8 +25,8 @@ export class CreateHistoryDto {
     @IsEnum(IntegrationHistoryType)
     type: IntegrationHistoryType;
 
-    @IsEnum(IntegrationHistoryProcess)
-    process: string;
+    @IsEnum(IntegrationHistoryEntity)
+    entity: IntegrationHistoryEntity;
 
     @IsString()
     @IsNotEmpty()
@@ -45,4 +45,11 @@ export class CreateHistoryDto {
     @IsNotEmpty()
     @Expose({ name: 'new_object' })
     newObject: Record<string, any>;
+}
+
+export class ErrorDetailsDto {
+    @Transform(({ value }) => Number.parseInt(value))
+    @IsNumber()
+    @IsNotEmpty()
+    id: number;
 }

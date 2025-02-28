@@ -1,6 +1,6 @@
 import { Body, Controller, Get, Param, Post, Query, Req } from '@nestjs/common';
 import { IntegrationHistoryService } from './integration-history.service';
-import { CreateHistoryDto, HistoryParamsDto, ListHistoryDto } from './integration-history.dtos';
+import { CreateHistoryDto, ErrorDetailsDto, HistoryParamsDto, ListHistoryDto } from './integration-history.dtos';
 import { Request } from 'express';
 
 @Controller('integrations/history')
@@ -25,5 +25,10 @@ export class IntegrationHistoryController {
     @Get('error')
     async listError() {
         return await this.historyService.listError();
+    }
+
+    @Get('error/:id/details')
+    async getError(@Param() params: ErrorDetailsDto) {
+        return await this.historyService.getError(params);
     }
 }
