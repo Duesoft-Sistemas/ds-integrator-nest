@@ -10,6 +10,7 @@ import { IntegrationsModule } from './integrations/integrations.module';
 import { CryptoModule } from './crypto/crypto.module';
 import { DatabaseModule } from './database/databse.module';
 import { IntegrationHistoryModule } from './integration-history/integration-history.module';
+import { IntegrationMappingModule } from './integration-mapping/integration-mapping.module';
 
 @Module({
     imports: [
@@ -21,6 +22,7 @@ import { IntegrationHistoryModule } from './integration-history/integration-hist
         IntegrationsModule,
         CryptoModule,
         IntegrationHistoryModule,
+        IntegrationMappingModule,
     ],
     controllers: [AppController],
     providers: [{ provide: 'APP_GUARD', useClass: AuthGuard }, AppService],

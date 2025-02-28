@@ -1,6 +1,11 @@
 import { IntegrationHistory } from '@entities/integration-history/history.entity';
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { CreateHistoryDto, ErrorDetailsDto, HistoryParamsDto, ListHistoryDto } from './integration-history.dtos';
+import {
+    CreateHistoryDto,
+    ErrorDetailsDto,
+    HistoryParamsDto,
+    ListHistoryDto,
+} from './integration-history.dtos';
 import { ClientRepository } from 'src/clients/clients.repository';
 import { Payload } from 'src/auth/auth.dtos';
 import { IntegrationHistoryType } from '@entities/integration-history/history.type.enum';
@@ -32,7 +37,7 @@ export class IntegrationHistoryService {
         return await this.historyRepository.save(register);
     }
 
-    async list(params: HistoryParamsDto, data: ListHistoryDto) : Promise<IntegrationHistory[]> {
+    async list(params: HistoryParamsDto, data: ListHistoryDto): Promise<IntegrationHistory[]> {
         const { clientId, integrationId } = params;
 
         const integration = await this.clientRepository.findIntegrationFromClient(
@@ -52,8 +57,7 @@ export class IntegrationHistoryService {
 
         const register = await this.historyRepository.findOneBy({ id });
 
-        if (!register)
-            throw new NotFoundException(`Registro de histórico ID ${id} não encontrado`);
+        if (!register) throw new NotFoundException(`Registro de histórico ID ${id} não encontrado`);
 
         return register;
     }

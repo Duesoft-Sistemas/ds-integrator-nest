@@ -1,6 +1,5 @@
 import * as _ from 'lodash';
 import { Client } from '@entities/clients/clients.entity';
-import { User } from '@entities/users/users.entity';
 import {
     ConflictException,
     Injectable,
@@ -38,7 +37,7 @@ export class ClientsService {
             throw new ConflictException(`Cliente com CNPJ ${client.cnpj} já registrado`);
         }
 
-        let profile = await this.userRepository.findByEmail(data.email);
+        const profile = await this.userRepository.findByEmail(data.email);
 
         if (profile) {
             throw new ConflictException(`E-mail ${profile.email} já registrado`);

@@ -53,7 +53,7 @@ export class ClientRepository extends Repository<Client> {
             const profile = queryRunner.manager.create(User, { email, password });
             profile.name = data.name;
             profile.user_id = user.id;
-            
+
             await queryRunner.manager.save(profile);
 
             const client = queryRunner.manager.create(Client, rest);
@@ -77,5 +77,4 @@ export class ClientRepository extends Repository<Client> {
             await queryRunner.release();
         }
     }
-    
 }

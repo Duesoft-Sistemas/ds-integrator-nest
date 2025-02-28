@@ -5,10 +5,15 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { IntegrationHistory } from '@entities/integration-history/history.entity';
 import { ClientsModule } from 'src/clients/clients.module';
 import { IntegrationHistoryRepository } from './integration-history.repository';
+import { IntegrationMappingModule } from 'src/integration-mapping/integration-mapping.module';
 
 @Module({
-    imports: [TypeOrmModule.forFeature([IntegrationHistory]), ClientsModule],
+    imports: [
+        TypeOrmModule.forFeature([IntegrationHistory]),
+        ClientsModule,
+        IntegrationMappingModule,
+    ],
     controllers: [IntegrationHistoryController],
-    providers: [IntegrationHistoryService, IntegrationHistoryRepository],
+    providers: [IntegrationHistoryRepository, IntegrationHistoryService],
 })
 export class IntegrationHistoryModule {}
