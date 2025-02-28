@@ -20,7 +20,7 @@ export class CryptoService {
             .slice(0, 12);
     }
 
-    async encrypt(text: string): Promise<Buffer<ArrayBuffer>> {
+    async encrypt(text: string): Promise<string> {
         if (!this.password || !this.iv) {
             throw new Error('Parâmetros para criptografia não configurado');
         }
@@ -29,10 +29,11 @@ export class CryptoService {
         const key = (await promisify(scrypt)(this.password, 'salt', 32)) as Buffer;
         const cipher = createCipheriv('aes-256-ctr', key, iv);
 
-        return Buffer.concat([cipher.update(text), cipher.final()]);
+        const buffer = Buffer.concat([cipher.update(text), cipher.final()]);
+        return buffer.toString('base64');
     }
 
-    async decrypt(text: Buffer<ArrayBuffer>): Promise<string> {
+    async decrypt(text: string): Promise<string> {
         if (!this.password || !this.iv) {
             throw new Error('Parâmetros para criptografia não configurado');
         }
@@ -41,7 +42,9 @@ export class CryptoService {
         const key = (await promisify(scrypt)(this.password, 'salt', 32)) as Buffer;
         const decipher = createDecipheriv('aes-256-ctr', key, iv);
 
-        const decryptedText = Buffer.concat([decipher.update(text), decipher.final()]);
+        const buffer = Buffer.from(text, 'base64');
+        const decryptedText = Buffer.concat([decipher.update(buffer), decipher.final()]);
+
         return decryptedText.toString('utf8');
     }
 }

@@ -31,53 +31,24 @@ export class ClientsService {
         private readonly cryptoService: CryptoService,
     ) {}
 
-    async create(data: CreateClientDto, user: Payload): Promise<Client | { password: any }> {
-        const { email, integrations: integrationIds, ...rest } = data;
-
+    async create(data: CreateClientDto, user: Payload): Promise<Client | { password: string }> {
         let client = await this.clientRepository.findByCnpj(data.cnpj);
 
         if (client) {
             throw new ConflictException(`Cliente com CNPJ ${client.cnpj} já registrado`);
         }
 
-        let profile = await this.userRepository.findByEmail(email);
+        let profile = await this.userRepository.findByEmail(data.email);
 
         if (profile) {
-            throw new ConflictException(`E-mail ${email} já registrado`);
+            throw new ConflictException(`E-mail ${profile.email} já registrado`);
         }
 
         const password = this.cryptoService.generatePassword();
         const passwordEncrypted = await this.cryptoService.encrypt(password);
 
-        const queryRunner = this.dataSource.createQueryRunner();
-        await queryRunner.connect();
-        await queryRunner.startTransaction();
-
-        try {
-            profile = queryRunner.manager.create(User, { email, password });
-            profile.name = data.name;
-            profile.user_id = user.id;
-            await queryRunner.manager.save(profile);
-
-            client = queryRunner.manager.create(Client, rest);
-            client.user_id = user.id;
-            client.profile_id = profile.id;
-            client.integrations = integrationIds.map((id) => ({
-                integration_id: id,
-            })) as ClientIntegrations[];
-            await queryRunner.manager.save(client);
-
-            await queryRunner.commitTransaction();
-            return { ..._.omit(client, 'integrations'), password: passwordEncrypted };
-        } catch (ex) {
-            await queryRunner.rollbackTransaction();
-
-            throw new InternalServerErrorException(
-                `Falha ao cadastrar cliente. ${(ex as Error).message}`,
-            );
-        } finally {
-            await queryRunner.release();
-        }
+        client = await this.clientRepository.register(data, password, user);
+        return { ...client, password: passwordEncrypted };
     }
 
     async update(id: number, data: UpdateClientDto): Promise<Partial<Client>> {

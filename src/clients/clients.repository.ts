@@ -1,8 +1,10 @@
 import { ClientIntegrations } from '@entities/clients/client.integrations.entity';
 import { Client } from '@entities/clients/clients.entity';
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { Repository, DataSource } from 'typeorm';
+import { CreateClientDto } from './clients.dtos';
+import { User } from '@entities/users/users.entity';
 
 @Injectable()
 export class ClientRepository extends Repository<Client> {
@@ -39,4 +41,41 @@ export class ClientRepository extends Repository<Client> {
     async findById(id: number): Promise<Client | null> {
         return await this.findOne({ where: { id }, relations: ['profile', 'integrations'] });
     }
+
+    async register(data: CreateClientDto, password: string, user: User): Promise<Client> {
+        const { email, integrations: integrationIds, ...rest } = data;
+
+        const queryRunner = this.dataSource.createQueryRunner();
+        await queryRunner.connect();
+        await queryRunner.startTransaction();
+
+        try {
+            const profile = queryRunner.manager.create(User, { email, password });
+            profile.name = data.name;
+            profile.user_id = user.id;
+            
+            await queryRunner.manager.save(profile);
+
+            const client = queryRunner.manager.create(Client, rest);
+            client.user_id = user.id;
+            client.profile_id = profile.id;
+            client.integrations = integrationIds.map((id) => ({
+                integration_id: id,
+            })) as ClientIntegrations[];
+
+            await queryRunner.manager.save(client);
+            await queryRunner.commitTransaction();
+
+            return client;
+        } catch (ex) {
+            await queryRunner.rollbackTransaction();
+
+            throw new InternalServerErrorException(
+                `Falha ao cadastrar cliente. ${(ex as Error).message}`,
+            );
+        } finally {
+            await queryRunner.release();
+        }
+    }
+    
 }
