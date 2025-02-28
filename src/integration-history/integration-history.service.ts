@@ -1,17 +1,17 @@
 import { IntegrationHistory } from '@entities/integration-history/history.entity';
 import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Raw, Repository } from 'typeorm';
+import { Raw } from 'typeorm';
 import { CreateHistoryDto, HistoryParamsDto, ListHistoryDto } from './integration-history.dtos';
 import { ClientRepository } from 'src/clients/clients.repository';
 import { Payload } from 'src/auth/auth.dtos';
+import { IntegrationHistoryType } from '@entities/integration-history/history.type.enum';
+import { IntegrationHistoryRepository } from './integration-history.repository';
 
 @Injectable()
 export class IntegrationHistoryService {
     constructor(
-        @InjectRepository(IntegrationHistory)
-        private readonly historyRepository: Repository<IntegrationHistory>,
         private readonly clientRepository: ClientRepository,
+        private readonly historyRepository: IntegrationHistoryRepository,
     ) {}
 
     async create(
@@ -33,7 +33,7 @@ export class IntegrationHistoryService {
         return await this.historyRepository.save(register);
     }
 
-    async list(params: HistoryParamsDto, data: ListHistoryDto) {
+    async list(params: HistoryParamsDto, data: ListHistoryDto) : Promise<IntegrationHistory[]> {
         const { clientId, integrationId } = params;
 
         const integration = await this.clientRepository.findIntegrationFromClient(
@@ -41,11 +41,10 @@ export class IntegrationHistoryService {
             integrationId,
         );
 
-        return await this.historyRepository.find({
-            where: {
-                clientIntegrationId: integration.id,
-                type: data.type || Raw(() => 'true'),
-            },
-        });
+        return await this.historyRepository.listByClient(integration.id, data.type);
+    }
+
+    async listError(): Promise<IntegrationHistory[]> {
+        return await this.historyRepository.listByType(IntegrationHistoryType.error);
     }
 }

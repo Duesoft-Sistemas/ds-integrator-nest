@@ -21,4 +21,9 @@ export class IntegrationHistoryController {
     async listHistory(@Param() params: HistoryParamsDto, @Query() query: ListHistoryDto) {
         return await this.historyService.list(params, query);
     }
+
+    @Get('error')
+    async listError() {
+        return await this.historyService.listError();
+    }
 }

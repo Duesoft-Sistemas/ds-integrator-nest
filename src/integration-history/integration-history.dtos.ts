@@ -18,7 +18,7 @@ export class HistoryParamsDto {
 export class ListHistoryDto {
     @IsOptional()
     @IsEnum(IntegrationHistoryType)
-    type: IntegrationHistoryType;
+    type?: IntegrationHistoryType;
 }
 
 export class CreateHistoryDto {
