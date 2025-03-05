@@ -11,6 +11,7 @@ import { Payload } from 'src/auth/auth.dtos';
 import { IntegrationHistoryType } from '@entities/integration-history/history.type.enum';
 import { IntegrationHistoryRepository } from './integration-history.repository';
 import { IntegrationMappingService } from 'src/integration-mapping/integration-mapping.service';
+import { instanceToPlain } from 'class-transformer';
 
 @Injectable()
 export class IntegrationHistoryService {
@@ -33,7 +34,7 @@ export class IntegrationHistoryService {
         );
 
         const register = this.historyRepository.create(data);
-        register.user_id = user.id;
+        register.userId = user.id;
         register.clientIntegrationId = integration.id;
 
         return await this.historyRepository.save(register);
@@ -59,11 +60,16 @@ export class IntegrationHistoryService {
 
         const register = await this.historyRepository.findOneBy({ id });
 
-        if (!register) throw new NotFoundException(`Registro de histórico ID ${id} não encontrado`);
+        if (!register) {
+            throw new NotFoundException(`Registro de histórico ID ${id} não encontrado`);
+        }
 
         const { entity, newObject, oldObject } = register;
         const dataMapped = await this.mappingService.mapEntity(entity, newObject, oldObject);
 
-        return { ...register, data: dataMapped };
+        return {
+            ...instanceToPlain(register) as IntegrationHistory,
+            data: dataMapped
+        };
     }
 }

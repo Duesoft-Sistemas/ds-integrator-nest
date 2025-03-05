@@ -15,7 +15,7 @@ export class IntegrationMappingService {
         await this.mappingRepository.delete({ entity });
 
         const promises = mapping.map(async (item) => {
-            const register = this.mappingRepository.create(item);
+            const register = this.mappingRepository.create({ ...item, entity });
             await this.mappingRepository.save(register);
 
             return register;
@@ -34,11 +34,17 @@ export class IntegrationMappingService {
         if (!mapping.length)
             throw new NotFoundException(`Mapeamento para entidade ${entity} não encontrado`);
 
-        return mapping.map((item) => ({
-            key: item.propertyName,
-            label: item.propertyLabel,
-            value: _.get(data, item.propertyName),
-            old_value: _.get(oldData, item.propertyName, undefined),
-        }));
+        return mapping.map((item) => {
+            const itemData: any = {
+                key: item.propertyName,
+                label: item.propertyLabel,
+                value: _.get(data, item.propertyName, null),
+                old_value: _.get(oldData, item.propertyName, null),
+            }
+
+            _.set(itemData, 'is_divergence', itemData.value !== itemData.old_value);
+            
+            return itemData;
+        });
     }
 }

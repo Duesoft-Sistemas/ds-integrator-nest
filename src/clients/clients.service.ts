@@ -20,6 +20,7 @@ import { DataSource, Not, Raw } from 'typeorm';
 import { ClientIntegrations } from '@entities/clients/client.integrations.entity';
 import { ClientRepository } from './clients.repository';
 import { UserRepository } from 'src/users/users.repository';
+import { instanceToPlain } from 'class-transformer';
 
 @Injectable()
 export class ClientsService {
@@ -78,8 +79,8 @@ export class ClientsService {
             client.name = data.name;
             client.profile.name = data.name;
             client.profile.email = data.email;
-            client.integrations = integrationIds.map((id) => ({
-                integration_id: id,
+            client.integrations = integrationIds.map((integrationId) => ({
+                integrationId,
             })) as ClientIntegrations[];
 
             await queryRunner.manager.delete(ClientIntegrations, integrationsToDelete);
@@ -138,7 +139,22 @@ export class ClientsService {
     async list(data: ListClientDto): Promise<Client[]> {
         const { only_active } = data;
 
-        return await this.clientRepository.findBy({ isActive: only_active || Raw(() => 'true') });
+        const result = await this.clientRepository.find({
+            where: { isActive: only_active || Raw(() => 'true') },
+            relations: ['profile', 'integrations', 'integrations.integration'],
+        });
+        
+        return (instanceToPlain(result) as Client[]).map(item => {
+            const integrations = item.integrations.map(integration => ({
+                ..._.pick(integration, ['id', 'is_active']),
+                ..._.pick(integration.integration, ['name', 'key', 'photo']),
+            })) as ClientIntegrations[];
+            
+            return {
+                ..._.pick(item, ['id', 'name', 'cnpj']) as Client,
+                integrations,
+            };
+        });
     }
 
     async findByCnpj(data: FindClientDto): Promise<Client> {

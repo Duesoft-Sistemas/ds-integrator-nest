@@ -2,6 +2,7 @@ import { Column, Entity, JoinColumn, OneToMany, OneToOne } from 'typeorm';
 import { BaseSchema } from '../base.schema';
 import { User } from '../users/users.entity';
 import { ClientIntegrations } from './client.integrations.entity';
+import { Expose } from 'class-transformer';
 
 @Entity({ name: 'clients' })
 export class Client extends BaseSchema {
@@ -11,11 +12,13 @@ export class Client extends BaseSchema {
     @Column({ unique: true })
     cnpj: string;
 
+    @Expose({ name: 'is_active' })
     @Column({ name: 'is_active', default: true })
     isActive: boolean;
 
-    @Column()
-    profile_id: number;
+    @Expose({ name: 'profile_id' })
+    @Column({ name: 'profile_id' })
+    profileId: number;
 
     @OneToOne(() => User, { onDelete: 'CASCADE' })
     @JoinColumn({ name: 'profile_id' })

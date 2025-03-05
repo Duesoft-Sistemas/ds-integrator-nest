@@ -1,5 +1,5 @@
 import { IntegrationHistoryEntity } from '@entities/integration-history/history.process.enum';
-import { Exclude, Expose } from 'class-transformer';
+import { Exclude, Expose, Type } from 'class-transformer';
 import { ArrayMinSize, IsArray, IsEnum, IsNotEmpty, IsOptional, IsString, ValidateNested } from 'class-validator';
 
 export class MappingDto {
@@ -22,11 +22,12 @@ export class CreateMappingDto {
     @Exclude()
     userId: number;
 
-    @Exclude()
+    @IsEnum(IntegrationHistoryEntity)
     entity: IntegrationHistoryEntity;
 
     @IsArray()
     @ArrayMinSize(1)
-    @ValidateNested()
+    @Type(() => MappingDto)
+    @ValidateNested({ each: true })
     mapping: MappingDto[];
 }

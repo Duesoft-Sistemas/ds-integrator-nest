@@ -52,15 +52,15 @@ export class ClientRepository extends Repository<Client> {
         try {
             const profile = queryRunner.manager.create(User, { email, password });
             profile.name = data.name;
-            profile.user_id = user.id;
+            profile.userId = user.id;
 
             await queryRunner.manager.save(profile);
 
             const client = queryRunner.manager.create(Client, rest);
-            client.user_id = user.id;
-            client.profile_id = profile.id;
-            client.integrations = integrationIds.map((id) => ({
-                integration_id: id,
+            client.userId = user.id;
+            client.profileId = profile.id;
+            client.integrations = integrationIds.map((integrationId) => ({
+                integrationId
             })) as ClientIntegrations[];
 
             await queryRunner.manager.save(client);

@@ -20,7 +20,7 @@ export class IntegrationsService {
         }
 
         integration = this.integrationRepository.create(data);
-        integration.user_id = user.id;
+        integration.userId = user.id;
 
         return await this.integrationRepository.save(integration);
     }
