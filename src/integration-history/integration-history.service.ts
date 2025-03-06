@@ -71,7 +71,6 @@ export class IntegrationHistoryService {
         }
 
         const { entity, newObject, oldObject } = register;
-
         const response = new HistoryDetailsResponse(register);
         response.mapping = await this.mappingService.mapEntity(entity, newObject, oldObject);
 
