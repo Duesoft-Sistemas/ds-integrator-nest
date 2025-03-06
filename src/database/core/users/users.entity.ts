@@ -1,6 +1,6 @@
 import { Client } from '@entities/clients/clients.entity';
 import * as bcrypt from 'bcrypt';
-import { Expose } from 'class-transformer';
+import { Exclude, Expose } from 'class-transformer';
 import { BaseSchema } from 'src/database/core/base.schema';
 import { BeforeInsert, BeforeUpdate, Column, Entity, OneToOne } from 'typeorm';
 
@@ -12,6 +12,7 @@ export class User extends BaseSchema {
     @Column({ unique: true })
     email: string;
 
+    @Exclude()
     @Column()
     password: string;
 

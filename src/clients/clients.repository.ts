@@ -2,8 +2,8 @@ import { ClientIntegrations } from '@entities/clients/client.integrations.entity
 import { Client } from '@entities/clients/clients.entity';
 import { Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { InjectDataSource } from '@nestjs/typeorm';
-import { Repository, DataSource } from 'typeorm';
-import { CreateClientDto } from './clients.dtos';
+import { Repository, DataSource, Raw } from 'typeorm';
+import { CreateClientDto, ListClientDto } from './clients.dtos';
 import { User } from '@entities/users/users.entity';
 
 @Injectable()
@@ -35,7 +35,19 @@ export class ClientRepository extends Repository<Client> {
     }
 
     async findByCnpj(cnpj: string): Promise<Client | null> {
-        return await this.findOne({ where: { cnpj }, relations: ['profile', 'integrations'] });
+        return await this.findOne({ 
+            where: { cnpj },
+            relations: ['profile', 'integrations', 'integrations.integration']
+        });
+    }
+
+    async list(filter: ListClientDto): Promise<Client[]> {
+        const { name, onlyActive } = filter;
+
+        return await this.find({
+            where: { isActive: onlyActive || Raw(() => 'true'), name: name },
+            relations: ['profile', 'integrations', 'integrations.integration']
+        })
     }
 
     async findById(id: number): Promise<Client | null> {

@@ -16,7 +16,7 @@ import {
     UpdateClientDto,
 } from 'src/clients/clients.dtos';
 import { CryptoService } from 'src/crypto/crypto.service';
-import { DataSource, Not, Raw } from 'typeorm';
+import { DataSource, Not } from 'typeorm';
 import { ClientIntegrations } from '@entities/clients/client.integrations.entity';
 import { ClientRepository } from './clients.repository';
 import { UserRepository } from 'src/users/users.repository';
@@ -137,24 +137,8 @@ export class ClientsService {
     }
 
     async list(data: ListClientDto): Promise<Client[]> {
-        const { only_active } = data;
-
-        const result = await this.clientRepository.find({
-            where: { isActive: only_active || Raw(() => 'true') },
-            relations: ['profile', 'integrations', 'integrations.integration'],
-        });
-        
-        return (instanceToPlain(result) as Client[]).map(item => {
-            const integrations = item.integrations.map(integration => ({
-                ..._.pick(integration, ['id', 'is_active']),
-                ..._.pick(integration.integration, ['name', 'key', 'photo']),
-            })) as ClientIntegrations[];
-            
-            return {
-                ..._.pick(item, ['id', 'name', 'cnpj']) as Client,
-                integrations,
-            };
-        });
+        const result = await this.clientRepository.list(data);
+        return instanceToPlain(result) as Client[];
     }
 
     async findByCnpj(data: FindClientDto): Promise<Client> {
@@ -164,6 +148,6 @@ export class ClientsService {
 
         if (!client) throw new NotFoundException(`Cliente com CNPJ ${cnpj} não encontrado`);
 
-        return client;
+        return instanceToPlain(client) as Client;
     }
 }

@@ -1,4 +1,4 @@
-import { Transform } from 'class-transformer';
+import { Expose, Transform } from 'class-transformer';
 import {
     ArrayMinSize,
     IsArray,
@@ -38,10 +38,15 @@ export class DeleteClientDto {
 }
 
 export class ListClientDto {
+    @Expose({ name: 'only_active' })
     @Transform(({ value }) => value === 'true')
     @IsBoolean()
     @IsOptional()
-    only_active?: boolean = false;
+    onlyActive?: boolean = false;
+
+    @IsString()
+    @IsOptional()
+    name?: string;
 }
 
 export class FindClientDto {
