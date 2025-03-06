@@ -26,7 +26,7 @@ export class IntegrationMappingService {
 
     async mapEntity(
         entity: IntegrationHistoryEntity,
-        data: Record<string, any>,
+        data?: Record<string, any>,
         oldData?: Record<string, any>,
     ): Promise<Array<any>> {
         const mapping = await this.mappingRepository.findByEntity(entity);

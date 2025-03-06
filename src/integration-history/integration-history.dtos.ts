@@ -16,9 +16,22 @@ export class HistoryParamsDto {
 }
 
 export class ListHistoryDto {
+    @Transform(({ value }) => value && (value as string).toUpperCase() as IntegrationHistoryType)
     @IsOptional()
     @IsEnum(IntegrationHistoryType)
     type?: IntegrationHistoryType;
+
+    @Transform(({ value }) => value && Number.parseInt(value))
+    @IsNumber()
+    @IsOptional()
+    @Expose({ name: 'integration_id'})
+    integrationId?: number;
+
+    @Transform(({ value }) => value && Number.parseInt(value))
+    @IsNumber()
+    @IsOptional()
+    @Expose({ name: 'client_id'})
+    clientId?: number;
 }
 
 export class CreateHistoryDto {

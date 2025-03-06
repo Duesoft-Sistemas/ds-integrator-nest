@@ -19,13 +19,13 @@ export class IntegrationHistory extends BaseSchema {
     @Column({ nullable: true })
     message?: string;
 
-    @Exclude()
+    @Expose({ name: 'old_object'})
     @Column({ type: 'jsonb', name: 'old_object', nullable: true })
     oldObject?: Record<string, any>;
 
-    @Exclude()
-    @Column({ type: 'jsonb', name: 'new_object' })
-    newObject: Record<string, any>;
+    @Expose({ name: 'new_object'})
+    @Column({ type: 'jsonb', name: 'new_object', nullable: true })
+    newObject?: Record<string, any>;
 
     @Column({ default: false })
     resolved: boolean;

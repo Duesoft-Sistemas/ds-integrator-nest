@@ -7,6 +7,7 @@ import {
     ListHistoryDto,
 } from './integration-history.dtos';
 import { Request } from 'express';
+import { instanceToPlain } from 'class-transformer';
 
 @Controller('integrations/history')
 export class IntegrationHistoryController {
@@ -22,18 +23,15 @@ export class IntegrationHistoryController {
         return await this.historyService.create(user, params, data);
     }
 
-    @Get(':integrationId/:clientId')
-    async listHistory(@Param() params: HistoryParamsDto, @Query() query: ListHistoryDto) {
-        return await this.historyService.list(params, query);
+    @Get()
+    async list(@Query() query: ListHistoryDto) {
+        const result = await this.historyService.list(query);
+        return instanceToPlain(result)
     }
 
-    @Get('error')
-    async listError() {
-        return await this.historyService.listError();
-    }
-
-    @Get('error/:id/details')
-    async getError(@Param() params: ErrorDetailsDto) {
-        return await this.historyService.getError(params);
+    @Get(':id/mapping')
+    async mappingError(@Param() params: ErrorDetailsDto) {
+        const result = await this.historyService.mappingError(params);
+        return instanceToPlain(result);
     }
 }

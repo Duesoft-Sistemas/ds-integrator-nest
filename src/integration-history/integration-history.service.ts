@@ -8,10 +8,10 @@ import {
 } from './integration-history.dtos';
 import { ClientRepository } from 'src/clients/clients.repository';
 import { Payload } from 'src/auth/auth.dtos';
-import { IntegrationHistoryType } from '@entities/integration-history/history.type.enum';
 import { IntegrationHistoryRepository } from './integration-history.repository';
 import { IntegrationMappingService } from 'src/integration-mapping/integration-mapping.service';
-import { instanceToPlain } from 'class-transformer';
+import * as _ from 'lodash';
+import { HistoryDetailsResponse } from './integration-history.response';
 
 @Injectable()
 export class IntegrationHistoryService {
@@ -40,22 +40,28 @@ export class IntegrationHistoryService {
         return await this.historyRepository.save(register);
     }
 
-    async list(params: HistoryParamsDto, data: ListHistoryDto): Promise<IntegrationHistory[]> {
-        const { clientId, integrationId } = params;
+    async list(data: ListHistoryDto): Promise<any[]> {
+        const result = await this.historyRepository.list(data);
 
-        const integration = await this.clientRepository.findIntegrationFromClient(
-            clientId,
-            integrationId,
-        );
-
-        return await this.historyRepository.listByClient(integration.id, data.type);
+        return result.map(({ integration, ...item }) => {
+            return {
+                ..._.omit(item, 'oldObject', 'newObject'),
+                integration: {
+                    id: integration.integrationId,
+                    name: integration.integration.name,
+                },
+                client: {
+                    id: integration.clientId,
+                    cnpj: integration.client.cnpj,
+                    name: integration.client.name,
+                    email: integration.client.profile.email,
+                    photo: integration.client.profile.photo,
+                }
+            } 
+        });
     }
 
-    async listError(): Promise<IntegrationHistory[]> {
-        return await this.historyRepository.listByType(IntegrationHistoryType.error);
-    }
-
-    async getError(data: ErrorDetailsDto): Promise<IntegrationHistory & { data: Array<any> }> {
+    async mappingError(data: ErrorDetailsDto): Promise<HistoryDetailsResponse> {
         const { id } = data;
 
         const register = await this.historyRepository.findOneBy({ id });
@@ -65,11 +71,10 @@ export class IntegrationHistoryService {
         }
 
         const { entity, newObject, oldObject } = register;
-        const dataMapped = await this.mappingService.mapEntity(entity, newObject, oldObject);
 
-        return {
-            ...instanceToPlain(register) as IntegrationHistory,
-            data: dataMapped
-        };
+        const response = new HistoryDetailsResponse(register);
+        response.mapping = await this.mappingService.mapEntity(entity, newObject, oldObject);
+
+        return response;
     }
 }

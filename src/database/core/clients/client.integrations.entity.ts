@@ -10,6 +10,7 @@ export class ClientIntegrations extends BaseSchema {
     @Column({ name: 'is_active', default: true })
     isActive: boolean;
 
+    @Expose({ name: 'client_id' })
     @Column({ name: 'client_id' })
     clientId: number;
 
