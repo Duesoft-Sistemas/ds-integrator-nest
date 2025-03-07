@@ -1,5 +1,5 @@
 export enum IntegrationHistoryType {
-    error = 'ERROR',
-    success = 'SUCCESS',
-    warning = 'WARNING',
+  error = 'ERROR',
+  success = 'SUCCESS',
+  warning = 'WARNING',
 }

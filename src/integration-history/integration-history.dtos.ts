@@ -4,65 +4,65 @@ import { Expose, Transform } from 'class-transformer';
 import { IsEnum, IsNotEmpty, IsNumber, IsObject, IsOptional, IsString } from 'class-validator';
 
 export class HistoryParamsDto {
-    @Transform(({ value }) => Number.parseInt(value))
-    @IsNumber()
-    @IsNotEmpty()
-    clientId: number;
+  @Transform(({ value }) => Number.parseInt(value))
+  @IsNumber()
+  @IsNotEmpty()
+  clientId: number;
 
-    @Transform(({ value }) => Number.parseInt(value))
-    @IsNumber()
-    @IsNotEmpty()
-    integrationId: number;
+  @Transform(({ value }) => Number.parseInt(value))
+  @IsNumber()
+  @IsNotEmpty()
+  integrationId: number;
 }
 
 export class ListHistoryDto {
-    @Transform(({ value }) => value && (value as string).toUpperCase() as IntegrationHistoryType)
-    @IsOptional()
-    @IsEnum(IntegrationHistoryType)
-    type?: IntegrationHistoryType;
+  @Transform(({ value }) => value && ((value as string).toUpperCase() as IntegrationHistoryType))
+  @IsOptional()
+  @IsEnum(IntegrationHistoryType)
+  type?: IntegrationHistoryType;
 
-    @Transform(({ value }) => value && Number.parseInt(value))
-    @IsNumber()
-    @IsOptional()
-    @Expose({ name: 'integration_id'})
-    integrationId?: number;
+  @Transform(({ value }) => value && Number.parseInt(value))
+  @IsNumber()
+  @IsOptional()
+  @Expose({ name: 'integration_id' })
+  integrationId?: number;
 
-    @Transform(({ value }) => value && Number.parseInt(value))
-    @IsNumber()
-    @IsOptional()
-    @Expose({ name: 'client_id'})
-    clientId?: number;
+  @Transform(({ value }) => value && Number.parseInt(value))
+  @IsNumber()
+  @IsOptional()
+  @Expose({ name: 'client_id' })
+  clientId?: number;
 }
 
 export class CreateHistoryDto {
-    @IsEnum(IntegrationHistoryType)
-    type: IntegrationHistoryType;
+  @IsEnum(IntegrationHistoryType)
+  type: IntegrationHistoryType;
 
-    @IsEnum(IntegrationHistoryEntity)
-    entity: IntegrationHistoryEntity;
+  @IsEnum(IntegrationHistoryEntity)
+  entity: IntegrationHistoryEntity;
 
-    @IsString()
-    @IsNotEmpty()
-    operation: string;
+  @IsString()
+  @IsNotEmpty()
+  operation: string;
 
-    @IsString()
-    @IsOptional()
-    message?: string;
+  @IsString()
+  @IsOptional()
+  message?: string;
 
-    @IsObject()
-    @IsOptional()
-    @Expose({ name: 'old_object' })
-    oldObject?: Record<string, any>;
+  @IsObject()
+  @IsOptional()
+  @Expose({ name: 'old_object' })
+  oldObject?: Record<string, any>;
 
-    @IsObject()
-    @IsNotEmpty()
-    @Expose({ name: 'new_object' })
-    newObject: Record<string, any>;
+  @IsObject()
+  @IsNotEmpty()
+  @Expose({ name: 'new_object' })
+  newObject: Record<string, any>;
 }
 
 export class ErrorDetailsDto {
-    @Transform(({ value }) => Number.parseInt(value))
-    @IsNumber()
-    @IsNotEmpty()
-    id: number;
+  @Transform(({ value }) => Number.parseInt(value))
+  @IsNumber()
+  @IsNotEmpty()
+  id: number;
 }
