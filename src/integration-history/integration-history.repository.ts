@@ -1,7 +1,6 @@
 import { IntegrationHistory } from '@entities/integration-history/history.entity';
 import { Injectable } from '@nestjs/common';
 import { InjectDataSource } from '@nestjs/typeorm';
-import * as _ from 'lodash';
 import { DataSource, Raw, Repository } from 'typeorm';
 
 import { ListHistoryDto } from './integration-history.dtos';

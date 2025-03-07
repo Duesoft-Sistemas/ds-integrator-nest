@@ -1,6 +1,5 @@
 import { IntegrationHistory } from '@entities/integration-history/history.entity';
 import { Injectable, NotFoundException } from '@nestjs/common';
-import * as _ from 'lodash';
 import { ClientRepository } from 'src/clients/clients.repository';
 import { IntegrationMappingService } from 'src/integration-mapping/integration-mapping.service';
 import { Payload } from 'src/jwt/jwt.dto';
@@ -12,7 +11,7 @@ import {
   ListHistoryDto,
 } from './integration-history.dtos';
 import { IntegrationHistoryRepository } from './integration-history.repository';
-import { HistoryDetailsResponse } from './integration-history.response';
+import { HistoryMappingResponse, HistoryResponse } from './integration-history.response';
 
 @Injectable()
 export class IntegrationHistoryService {
@@ -27,11 +26,11 @@ export class IntegrationHistoryService {
     params: HistoryParamsDto,
     data: CreateHistoryDto,
   ): Promise<Partial<IntegrationHistory>> {
-    const { clientId, integrationId } = params;
+    const { clientId, integrationKey } = params;
 
     const integration = await this.clientRepository.findIntegrationFromClient(
       clientId,
-      integrationId,
+      integrationKey,
     );
 
     const register = this.historyRepository.create(data);
@@ -41,28 +40,12 @@ export class IntegrationHistoryService {
     return await this.historyRepository.save(register);
   }
 
-  async list(data: ListHistoryDto): Promise<any[]> {
+  async list(data: ListHistoryDto): Promise<HistoryResponse[]> {
     const result = await this.historyRepository.list(data);
-
-    return result.map(({ integration, ...item }) => {
-      return {
-        ..._.omit(item, 'oldObject', 'newObject'),
-        integration: {
-          id: integration.integrationId,
-          name: integration.integration.name,
-        },
-        client: {
-          id: integration.clientId,
-          cnpj: integration.client.cnpj,
-          name: integration.client.name,
-          email: integration.client.profile.email,
-          photo: integration.client.profile.photo,
-        },
-      };
-    });
+    return result.map((item) => new HistoryResponse(item));
   }
 
-  async mappingError(data: ErrorDetailsDto): Promise<HistoryDetailsResponse> {
+  async mappingError(data: ErrorDetailsDto): Promise<HistoryMappingResponse> {
     const { id } = data;
 
     const register = await this.historyRepository.findOneBy({ id });
@@ -72,7 +55,7 @@ export class IntegrationHistoryService {
     }
 
     const { entity, newObject, oldObject } = register;
-    const response = new HistoryDetailsResponse(register);
+    const response = new HistoryMappingResponse(register);
     response.mapping = await this.mappingService.mapEntity(entity, newObject, oldObject);
 
     return response;

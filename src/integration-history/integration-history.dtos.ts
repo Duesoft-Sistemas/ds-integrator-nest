@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unsafe-return */
+import { IntegrationKey } from '@entities/integration/integration.key.enum';
 import { IntegrationHistoryEntity } from '@entities/integration-history/history.process.enum';
 import { IntegrationHistoryType } from '@entities/integration-history/history.type.enum';
 import { Expose, Transform } from 'class-transformer';
@@ -9,10 +11,10 @@ export class HistoryParamsDto {
   @IsNotEmpty()
   clientId: number;
 
-  @Transform(({ value }) => Number.parseInt(value))
-  @IsNumber()
+  @Transform(({ value }) => value as IntegrationKey)
   @IsNotEmpty()
-  integrationId: number;
+  @IsEnum(IntegrationKey)
+  integrationKey: IntegrationKey;
 }
 
 export class ListHistoryDto {
@@ -57,7 +59,7 @@ export class CreateHistoryDto {
   @IsObject()
   @IsNotEmpty()
   @Expose({ name: 'new_object' })
-  newObject: Record<string, any>;
+  newObject?: Record<string, any>;
 }
 
 export class ErrorDetailsDto {

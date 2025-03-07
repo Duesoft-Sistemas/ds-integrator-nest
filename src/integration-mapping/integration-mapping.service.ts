@@ -1,10 +1,11 @@
 import { IntegrationHistoryEntity } from '@entities/integration-history/history.process.enum';
 import { IntegrationMapping } from '@entities/integration-mapping/mapping.entity';
-import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import * as _ from 'lodash';
 
 import { CreateMappingDto } from './integration-mapping.dtos';
 import { IntegrationMappingRepository } from './integration-mapping.repository';
+import { MappingObjectResponse } from './integration-mapping.response';
 
 @Injectable()
 export class IntegrationMappingService {
@@ -36,16 +37,9 @@ export class IntegrationMappingService {
       throw new NotFoundException(`Mapeamento para entidade ${entity} não encontrado`);
 
     return mapping.map((item) => {
-      const itemData: any = {
-        key: item.propertyName,
-        label: item.propertyLabel,
-        value: _.get(data, item.propertyName, null),
-        old_value: _.get(oldData, item.propertyName, null),
-      };
-
-      _.set(itemData, 'is_divergence', itemData.value !== itemData.old_value);
-
-      return itemData;
+      const value = _.get(data, item.propertyName, null);
+      const oldValue = _.get(oldData, item.propertyName, null);
+      return new MappingObjectResponse<typeof value>(item, value, oldValue);
     });
   }
 }

@@ -13,7 +13,7 @@ import { IntegrationHistoryService } from './integration-history.service';
 export class IntegrationHistoryController {
   constructor(private readonly historyService: IntegrationHistoryService) {}
 
-  @Post(':integrationId/:clientId')
+  @Post(':integrationKey/:clientId')
   async createHistory(
     @Req() req: Request,
     @Param() params: HistoryParamsDto,

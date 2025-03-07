@@ -1,5 +1,6 @@
 import { ClientIntegrations } from '@entities/clients/client.integrations.entity';
 import { Client } from '@entities/clients/clients.entity';
+import { IntegrationKey } from '@entities/integration/integration.key.enum';
 import { User } from '@entities/users/users.entity';
 import { UserRole } from '@entities/users/users.role';
 import { Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
@@ -16,24 +17,22 @@ export class ClientRepository extends Repository<Client> {
 
   async findIntegrationFromClient(
     clientId: number,
-    integrationId: number,
+    integrationKey: IntegrationKey,
   ): Promise<ClientIntegrations> {
-    const queryBuilder = this.createQueryBuilder('client')
-      .leftJoinAndSelect('client.integrations', 'clientIntegrations')
-      .leftJoinAndSelect('clientIntegrations.integration', 'integration')
-      .where(
-        'client.isActive = :isActive AND clientIntegrations.isActive = :isActive AND client.id = :clientId AND integration.id = :integrationId',
-        { clientId, integrationId, isActive: true },
-      )
-      .select(['client', 'clientIntegrations']);
+    const register = await this.findOne({
+      where: { id: clientId, integrations: { integration: { key: integrationKey } } },
+      relations: ['integrations', 'integrations.integration'],
+    });
 
-    const register = await queryBuilder.getOne();
-
-    if (!register || !register.integrations.length) {
-      throw new NotFoundException(`Integração ID ${integrationId} não encontrada`);
+    if (!register) {
+      throw new NotFoundException(
+        `Integração ${integrationKey} não encontrada par ao cliente mencionado`,
+      );
     }
 
-    return register.integrations[0];
+    return register.integrations.find(
+      (r) => r.integration.key == integrationKey,
+    ) as ClientIntegrations;
   }
 
   async findByCnpj(cnpj: string): Promise<Client | null> {
