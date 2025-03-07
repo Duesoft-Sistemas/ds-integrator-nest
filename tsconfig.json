@@ -21,7 +21,7 @@
     "strict": true,
     "paths": {
       "@entities/*": ["src/database/core/*"],
-      "@metadata/*": ["src/metadata/*"]
+      "@metadata/*": ["src/metadata/*"],
     }
   }
 }

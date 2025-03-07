@@ -2,9 +2,10 @@ import { ConflictException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CreateUserDto } from './users.dtos';
-import { Payload } from 'src/auth/auth.dtos';
 import { User } from '@entities/users/users.entity';
 import { ConfigService } from '@nestjs/config';
+import { UserRole } from '@entities/users/users.role';
+import { Payload } from 'src/jwt/jwt.dto';
 
 @Injectable()
 export class UsersService {
@@ -26,27 +27,31 @@ export class UsersService {
         });
     }
 
-    async createAdmin(data: CreateUserDto, userRegister: Payload): Promise<User> {
-        let user = await this.findByEmail(data.email);
+    async createAdmin(data: CreateUserDto, user: Payload): Promise<User> {
+        let register = await this.findByEmail(data.email);
 
-        if (user) {
-            throw new ConflictException(`O e-mail ${user.email} já existe`);
+        if (register) {
+            throw new ConflictException(`O e-mail ${register.email} já existe`);
         }
 
-        user = this.usersRepository.create({ ...data, user: userRegister });
-
-        return await this.usersRepository.save(user);
+        register = this.usersRepository.create(data);
+        register.userId = user.id;
+        register.roles = [UserRole.admin];
+        return await this.usersRepository.save(register);
     }
 
-    async create(data: CreateUserDto, userRegister: Payload): Promise<User> {
+    async create(data: CreateUserDto, user: Payload): Promise<User> {
         const { email } = data;
-        let user = await this.findByEmail(email);
 
-        if (user) {
-            throw new ConflictException(`O e-mail ${user.email} já existe`);
+        let register = await this.findByEmail(email);
+
+        if (register) {
+            throw new ConflictException(`O e-mail ${register.email} já existe`);
         }
 
-        user = this.usersRepository.create({ ...data, user: userRegister });
-        return await this.usersRepository.save(user);
+        register = this.usersRepository.create(data);
+        register.userId = user.id;
+        register.roles = [UserRole.support];
+        return await this.usersRepository.save(register);
     }
 }

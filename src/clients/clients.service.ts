@@ -7,7 +7,6 @@ import {
     NotFoundException,
 } from '@nestjs/common';
 import { InjectDataSource } from '@nestjs/typeorm';
-import { Payload } from 'src/auth/auth.dtos';
 import {
     CreateClientDto,
     DeleteClientDto,
@@ -21,6 +20,7 @@ import { ClientIntegrations } from '@entities/clients/client.integrations.entity
 import { ClientRepository } from './clients.repository';
 import { UserRepository } from 'src/users/users.repository';
 import { instanceToPlain } from 'class-transformer';
+import { Payload } from 'src/jwt/jwt.dto';
 
 @Injectable()
 export class ClientsService {

@@ -3,6 +3,7 @@ import * as bcrypt from 'bcrypt';
 import { Exclude, Expose } from 'class-transformer';
 import { BaseSchema } from 'src/database/core/base.schema';
 import { BeforeInsert, BeforeUpdate, Column, Entity, OneToOne } from 'typeorm';
+import { UserRole } from './users.role';
 
 @Entity({ name: 'users' })
 export class User extends BaseSchema {
@@ -25,7 +26,10 @@ export class User extends BaseSchema {
     isAdmin: boolean;
 
     @Column({ nullable: true })
-    photo!: string;
+    photo?: string;
+
+    @Column({ type: 'enum', enum: UserRole, array: true, nullable: true })
+    roles: UserRole[];
 
     @OneToOne(() => Client, (client) => client.profile, { nullable: true })
     client?: Client;

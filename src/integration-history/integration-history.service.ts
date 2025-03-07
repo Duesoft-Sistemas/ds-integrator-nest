@@ -7,11 +7,11 @@ import {
     ListHistoryDto,
 } from './integration-history.dtos';
 import { ClientRepository } from 'src/clients/clients.repository';
-import { Payload } from 'src/auth/auth.dtos';
 import { IntegrationHistoryRepository } from './integration-history.repository';
 import { IntegrationMappingService } from 'src/integration-mapping/integration-mapping.service';
 import * as _ from 'lodash';
 import { HistoryDetailsResponse } from './integration-history.response';
+import { Payload } from 'src/jwt/jwt.dto';
 
 @Injectable()
 export class IntegrationHistoryService {

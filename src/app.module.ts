@@ -11,11 +11,14 @@ import { CryptoModule } from './crypto/crypto.module';
 import { DatabaseModule } from './database/databse.module';
 import { IntegrationHistoryModule } from './integration-history/integration-history.module';
 import { IntegrationMappingModule } from './integration-mapping/integration-mapping.module';
+import { RolesGuard } from './auth/role.guard';
+import { JwtModuleInternal } from './jwt/jwt.module';
 
 @Module({
     imports: [
         ConfigModule.forRoot({ isGlobal: true }),
         DatabaseModule,
+        JwtModuleInternal,
         AuthModule,
         UsersModule,
         ClientsModule,
@@ -25,6 +28,10 @@ import { IntegrationMappingModule } from './integration-mapping/integration-mapp
         IntegrationMappingModule,
     ],
     controllers: [AppController],
-    providers: [{ provide: 'APP_GUARD', useClass: AuthGuard }, AppService],
+    providers: [
+        { provide: 'APP_GUARD', useClass: AuthGuard },
+        { provide: 'APP_GUARD', useClass: RolesGuard },
+        AppService
+    ],
 })
 export class AppModule {}

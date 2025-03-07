@@ -1,4 +1,4 @@
-import { Payload } from 'src/auth/auth.dtos';
+import { Payload } from "src/jwt/jwt.dto";
 
 declare module 'express' {
     interface Request {

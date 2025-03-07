@@ -3,7 +3,7 @@ import { ConflictException, Injectable, NotFoundException } from '@nestjs/common
 import { InjectRepository } from '@nestjs/typeorm';
 import { Not, Repository } from 'typeorm';
 import { CreateIntegrationDto, UpdateIntegrationDto } from './integrations.dtos';
-import { Payload } from 'src/auth/auth.dtos';
+import { Payload } from 'src/jwt/jwt.dto';
 
 @Injectable()
 export class IntegrationsService {

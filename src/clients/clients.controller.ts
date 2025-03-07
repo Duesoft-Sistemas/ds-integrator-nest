@@ -19,11 +19,14 @@ import {
 } from './clients.dtos';
 import { ClientsService } from './clients.service';
 import { Request } from 'express';
+import { Roles } from '@metadata/role.decorator';
+import { UserRole } from '@entities/users/users.role';
 
 @Controller('clients')
 export class ClientsController {
     constructor(private readonly clientsService: ClientsService) {}
 
+    @Roles([UserRole.admin])
     @Post()
     async createClient(@Req() req: Request, @Body() data: CreateClientDto) {
         const { user } = req;

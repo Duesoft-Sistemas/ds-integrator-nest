@@ -5,6 +5,7 @@ import { InjectDataSource } from '@nestjs/typeorm';
 import { Repository, DataSource, Raw } from 'typeorm';
 import { CreateClientDto, ListClientDto } from './clients.dtos';
 import { User } from '@entities/users/users.entity';
+import { UserRole } from '@entities/users/users.role';
 
 @Injectable()
 export class ClientRepository extends Repository<Client> {
@@ -65,6 +66,7 @@ export class ClientRepository extends Repository<Client> {
             const profile = queryRunner.manager.create(User, { email, password });
             profile.name = data.name;
             profile.userId = user.id;
+            profile.roles = [UserRole.customer];
 
             await queryRunner.manager.save(profile);
 
