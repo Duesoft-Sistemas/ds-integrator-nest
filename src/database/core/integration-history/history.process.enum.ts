@@ -4,6 +4,7 @@ export enum IntegrationHistoryEntity {
   product = 'PRODUCT',
   payment = 'PAYMENT_METHOD',
   category = 'PRODUCT_CATEGORY',
+  brand = 'PRODUCT_BRAND',
   order = 'ORDER',
   store = 'STORE',
 }
