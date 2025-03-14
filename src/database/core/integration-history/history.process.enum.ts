@@ -1,5 +1,5 @@
 export enum IntegrationHistoryEntity {
-  client = 'CLIENT',
+  client = 'CUSTOMER',
   invoice = 'INVOICE',
   product = 'PRODUCT',
   payment = 'PAYMENT_METHOD',
