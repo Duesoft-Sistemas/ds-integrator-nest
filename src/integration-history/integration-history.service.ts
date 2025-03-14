@@ -48,7 +48,7 @@ export class IntegrationHistoryService {
   async mappingError(data: ErrorDetailsDto): Promise<HistoryMappingResponse> {
     const { id } = data;
 
-    const register = await this.historyRepository.findOneBy({ id });
+    const register = await this.historyRepository.findById(id);
 
     if (!register) {
       throw new NotFoundException(`Registro de histórico ID ${id} não encontrado`);

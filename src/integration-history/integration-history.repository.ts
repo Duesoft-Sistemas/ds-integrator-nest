@@ -22,12 +22,14 @@ export class IntegrationHistoryRepository extends Repository<IntegrationHistory>
           integrationId: integrationId || Raw(() => 'true'),
         },
       },
-      relations: [
-        'integration',
-        'integration.integration',
-        'integration.client',
-        'integration.client.profile',
-      ],
+      relations: ['integration', 'integration.integration', 'integration.client'],
+    });
+  }
+
+  async findById(id: number): Promise<IntegrationHistory | null> {
+    return await this.findOne({
+      where: { id },
+      relations: ['integration', 'integration.integration'],
     });
   }
 }
