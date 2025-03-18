@@ -36,6 +36,7 @@ export class UsersService {
     }
 
     register = this.usersRepository.create(data);
+    register.isAdmin = true;
     register.roles = [UserRole.admin];
     return await this.usersRepository.save(register);
   }
