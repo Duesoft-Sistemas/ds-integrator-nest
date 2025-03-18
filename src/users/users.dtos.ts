@@ -1,4 +1,4 @@
-import { IsEmail, IsNotEmpty, IsOptional } from 'class-validator';
+import { IsEmail, IsNotEmpty, IsOptional, IsString } from 'class-validator';
 
 export class CreateUserDto {
   @IsOptional()
@@ -12,6 +12,7 @@ export class CreateUserDto {
 }
 
 export class CreateUserAdminDto extends CreateUserDto {
-  @IsNotEmpty({ message: 'identificação deve ser informado' })
+  @IsString()
+  @IsOptional()
   device_id: string;
 }

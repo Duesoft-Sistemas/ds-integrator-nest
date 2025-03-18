@@ -28,7 +28,7 @@ export class UsersService {
     });
   }
 
-  async createAdmin(data: CreateUserDto, user: Payload): Promise<User> {
+  async createAdmin(data: CreateUserDto): Promise<User> {
     let register = await this.findByEmail(data.email);
 
     if (register) {
@@ -36,7 +36,6 @@ export class UsersService {
     }
 
     register = this.usersRepository.create(data);
-    register.userId = user.id;
     register.roles = [UserRole.admin];
     return await this.usersRepository.save(register);
   }

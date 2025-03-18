@@ -18,7 +18,7 @@ export class UsersController {
       throw new UnauthorizedException('Acesso negado');
     }
 
-    return await this.usersService.createAdmin(rest, req.user);
+    return await this.usersService.createAdmin(rest);
   }
 
   @Post()
