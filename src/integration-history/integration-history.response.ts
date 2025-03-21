@@ -44,6 +44,8 @@ export class HistoryMappingResponse extends OmitType(IntegrationHistory, ['integ
   @Expose({ name: 'integration_name' })
   integrationName: string;
 
+  client: Client;
+
   mapping: Array<any>;
 
   constructor(source: IntegrationHistory) {
@@ -53,6 +55,7 @@ export class HistoryMappingResponse extends OmitType(IntegrationHistory, ['integ
 
     Object.assign(this, register);
 
+    this.client = _.get(integration, 'client');
     this.integrationId = _.get(integration, 'integration.id');
     this.integrationName = _.get(integration, 'integration.name');
 

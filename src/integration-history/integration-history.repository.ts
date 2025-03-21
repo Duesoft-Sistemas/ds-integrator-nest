@@ -29,7 +29,7 @@ export class IntegrationHistoryRepository extends Repository<IntegrationHistory>
   async findById(id: number): Promise<IntegrationHistory | null> {
     return await this.findOne({
       where: { id },
-      relations: ['integration', 'integration.integration'],
+      relations: ['integration', 'integration.integration', 'integration.client'],
     });
   }
 }
