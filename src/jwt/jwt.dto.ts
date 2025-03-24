@@ -13,16 +13,16 @@ export type TokenType = 'access' | 'refresh';
 export class Payload extends PickType(User, payloadFields) {
   @IsNumber()
   @Expose({ name: 'client_id' })
-  clientId?: number | null;
+  clientId?: number;
 
   constructor(user: User) {
     super();
 
     payloadFields.forEach((key) => {
       const value = _.get(user, key);
-      value && Object.assign(this, { [key]: value });
+      if (value) Object.assign(this, { [key]: value });
     });
 
-    this.clientId = user.client?.id ?? null;
+    this.clientId = user.client?.id;
   }
 }

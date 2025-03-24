@@ -2,6 +2,7 @@ import { ClientIntegrations } from '@entities/clients/client.integrations.entity
 import { Client } from '@entities/clients/clients.entity';
 import {
   ConflictException,
+  ForbiddenException,
   Injectable,
   InternalServerErrorException,
   NotFoundException,
@@ -21,15 +22,20 @@ import { Payload } from 'src/jwt/jwt.dto';
 import { UserRepository } from 'src/users/users.repository';
 import { DataSource, Not } from 'typeorm';
 
-import { ClientRepository } from './clients.repository';
+import { IntegrationPollingDto } from './dtos/integration.polling.dto';
+import { ListIntegrationDto } from './dtos/list.integration.polling.dto';
+import { ClientIntegrationRepository } from './repositories/client.integrations.repository';
+import { ClientRepository } from './repositories/clients.repository';
+import { ClientIntegrationResponse } from './response/client.integrations.response';
 
 @Injectable()
 export class ClientsService {
   constructor(
     @InjectDataSource() private readonly dataSource: DataSource,
+    private readonly cryptoService: CryptoService,
     private readonly userRepository: UserRepository,
     private readonly clientRepository: ClientRepository,
-    private readonly cryptoService: CryptoService,
+    private readonly clientIntegrationRepository: ClientIntegrationRepository,
   ) {}
 
   async create(data: CreateClientDto, user: Payload): Promise<Client | { password: string }> {
@@ -150,5 +156,35 @@ export class ClientsService {
     if (!client) throw new NotFoundException(`Cliente com CNPJ ${cnpj} não encontrado`);
 
     return instanceToPlain(client) as Client;
+  }
+
+  async polling(data: IntegrationPollingDto): Promise<void> {
+    const { clientId, integrationKey } = data;
+
+    const client = await this.clientRepository.findOne({
+      where: { id: clientId, integrations: { integration: { key: integrationKey } } },
+      relations: ['integrations', 'integrations.integration'],
+    });
+
+    if (!client) {
+      throw new NotFoundException('Cliente ou integração não encontrado');
+    }
+
+    if (!client.isActive) {
+      throw new ForbiddenException('Cliente não está ativo');
+    }
+
+    const integration = client.integrations.find((item) => item.integration.key == integrationKey);
+
+    if (!integration || !integration.isActive) {
+      throw new NotFoundException(`Integração ${integrationKey} não está ativa`);
+    }
+
+    await this.clientIntegrationRepository.polling(integration.id);
+  }
+
+  async listIntegrations(data: ListIntegrationDto): Promise<ClientIntegrationResponse[]> {
+    const response = await this.clientRepository.listIntegrations(data);
+    return response.map((item) => new ClientIntegrationResponse(item));
   }
 }

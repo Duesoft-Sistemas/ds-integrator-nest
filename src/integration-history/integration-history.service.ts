@@ -1,6 +1,6 @@
 import { IntegrationHistory } from '@entities/integration-history/history.entity';
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { ClientRepository } from 'src/clients/clients.repository';
+import { ClientRepository } from 'src/clients/repositories/clients.repository';
 import { IntegrationMappingService } from 'src/integration-mapping/integration-mapping.service';
 import { Payload } from 'src/jwt/jwt.dto';
 

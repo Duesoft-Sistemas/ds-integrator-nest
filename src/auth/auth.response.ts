@@ -1,4 +1,3 @@
-import { User } from '@entities/users/users.entity';
 import { Expose } from 'class-transformer';
 import { Payload } from 'src/jwt/jwt.dto';
 

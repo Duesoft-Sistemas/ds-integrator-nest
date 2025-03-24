@@ -1,3 +1,4 @@
+import { IntegrationKey } from '@entities/integration/integration.key.enum';
 import { UserRole } from '@entities/users/users.role';
 import { Roles } from '@metadata/role.decorator';
 import {
@@ -52,7 +53,20 @@ export class ClientsController {
   }
 
   @Get(':cnpj')
-  async FindClient(@Param() params: FindClientDto) {
+  async findClient(@Param() params: FindClientDto) {
     return await this.clientsService.findByCnpj(params);
+  }
+
+  @Roles([UserRole.customer])
+  @Post('integrations/:key/polling')
+  async polling(@Req() req: Request, @Param('key') integrationKey: IntegrationKey) {
+    const { clientId } = req.user;
+    return await this.clientsService.polling({ clientId, integrationKey });
+  }
+
+  @Get('integrations/:status')
+  async listIntegrations(@Req() req: Request) {
+    const { clientId } = req.user;
+    return this.clientsService.listIntegrations({ clientId });
   }
 }

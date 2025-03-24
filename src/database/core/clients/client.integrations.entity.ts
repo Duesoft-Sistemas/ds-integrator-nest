@@ -25,4 +25,8 @@ export class ClientIntegrations extends BaseSchema {
   @ManyToOne(() => Integration, (entity) => entity.clientIntegrations, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'integration_id' })
   integration: Integration;
+
+  @Expose({ name: 'last_polling' })
+  @Column({ name: 'last_polling', nullable: true })
+  lastPolling: Date;
 }
