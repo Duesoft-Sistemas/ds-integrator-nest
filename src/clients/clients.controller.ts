@@ -7,6 +7,7 @@ import {
   Delete,
   Get,
   Param,
+  ParseEnumPipe,
   ParseIntPipe,
   Post,
   Put,
@@ -23,6 +24,7 @@ import {
   UpdateClientDto,
 } from './clients.dtos';
 import { ClientsService } from './clients.service';
+import { IntegrationStatus } from './dtos/integration.status.enum';
 
 @Controller('clients')
 export class ClientsController {
@@ -65,8 +67,11 @@ export class ClientsController {
   }
 
   @Get('integrations/:status')
-  async listIntegrations(@Req() req: Request) {
+  async listIntegrations(
+    @Req() req: Request,
+    @Param('status', new ParseEnumPipe(IntegrationStatus)) status: IntegrationStatus,
+  ) {
     const { clientId } = req.user;
-    return this.clientsService.listIntegrations({ clientId });
+    return this.clientsService.listIntegrations({ clientId, status });
   }
 }

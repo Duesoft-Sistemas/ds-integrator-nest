@@ -1,5 +1,7 @@
 import { Expose } from 'class-transformer';
-import { IsNumber, IsOptional, IsPositive } from 'class-validator';
+import { IsEnum, IsNumber, IsOptional, IsPositive } from 'class-validator';
+
+import { IntegrationStatus } from './integration.status.enum';
 
 export class ListIntegrationDto {
   @IsNumber()
@@ -7,4 +9,7 @@ export class ListIntegrationDto {
   @IsOptional()
   @Expose({ name: 'client_id' })
   clientId?: number | null;
+
+  @IsEnum(IntegrationStatus)
+  status: IntegrationStatus;
 }

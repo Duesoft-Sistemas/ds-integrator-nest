@@ -1,4 +1,5 @@
 import { ClientIntegrations } from '@entities/clients/client.integrations.entity';
+import useLocale from '@locale';
 import { Injectable } from '@nestjs/common';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource, Repository } from 'typeorm';
@@ -12,7 +13,7 @@ export class ClientIntegrationRepository extends Repository<ClientIntegrations> 
   async polling(id: number) {
     const register = await this.findOneByOrFail({ id });
 
-    register.lastPolling = new Date();
+    register.lastPolling = useLocale();
     await this.save(register);
   }
 }
