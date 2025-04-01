@@ -14,6 +14,7 @@ import { IntegrationMappingModule } from './integration-mapping/integration-mapp
 import { IntegrationsModule } from './integrations/integrations.module';
 import { JwtModuleInternal } from './jwt/jwt.module';
 import { UsersModule } from './users/users.module';
+import { SelfCallService } from './self-call/self-call.service';
 
 @Module({
   imports: [
@@ -33,6 +34,7 @@ import { UsersModule } from './users/users.module';
     { provide: 'APP_GUARD', useClass: AuthGuard },
     { provide: 'APP_GUARD', useClass: RolesGuard },
     AppService,
+    SelfCallService
   ],
 })
 export class AppModule {}
