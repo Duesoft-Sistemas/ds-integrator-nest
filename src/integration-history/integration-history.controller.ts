@@ -2,7 +2,8 @@ import { Body, Controller, Get, Param, Post, Query, Req } from '@nestjs/common';
 import { Request } from 'express';
 
 import { CreateHistoryDto } from './dtos/create-integration-history.dto';
-import { ErrorDetailsDto, HistoryParamsDto, ListHistoryDto } from './integration-history.dtos';
+import { ListHistoryDto } from './dtos/list-integration-history.dto';
+import { ErrorDetailsDto, HistoryParamsDto } from './integration-history.dtos';
 import { IntegrationHistoryService } from './integration-history.service';
 
 @Controller('integrations/history')

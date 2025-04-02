@@ -5,8 +5,8 @@ import { ClientsModule } from 'src/clients/clients.module';
 import { IntegrationMappingModule } from 'src/integration-mapping/integration-mapping.module';
 
 import { IntegrationHistoryController } from './integration-history.controller';
-import { IntegrationHistoryRepository } from './integration-history.repository';
 import { IntegrationHistoryService } from './integration-history.service';
+import { IntegrationHistoryRepository } from './repositories/integration-history.repository';
 
 @Module({
   imports: [

@@ -5,7 +5,7 @@ import { User } from '@entities/users/users.entity';
 import { UserRole } from '@entities/users/users.role';
 import { Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { InjectDataSource } from '@nestjs/typeorm';
-import { DataSource, IsNull, Not, Raw, Repository } from 'typeorm';
+import { DataSource, Raw, Repository } from 'typeorm';
 
 import { CreateClientDto, ListClientDto } from '../clients.dtos';
 import { ListIntegrationDto } from '../dtos/list.integration.polling.dto';
@@ -96,13 +96,20 @@ export class ClientRepository extends Repository<Client> {
   async listIntegrations(data: ListIntegrationDto) {
     const { clientId } = data;
 
-    return await this.find({
-      where: {
-        isActive: true,
-        id: clientId || Raw(() => 'true'),
-        integrations: { lastPolling: Not(IsNull()) },
-      },
-      relations: ['integrations', 'integrations.integration'],
-    });
+    const wheres: string[] = [
+      'client.is_active = true',
+      'clientIntegration.last_polling IS NOT NULL',
+    ];
+
+    if (clientId) {
+      wheres.push(`client.id = ${clientId}`);
+    }
+
+    return await this.createQueryBuilder('client')
+      .where(wheres.join(' AND '))
+      .leftJoinAndSelect('client.integrations', 'clientIntegration')
+      .leftJoinAndSelect('clientIntegration.integration', 'integration')
+      .orderBy('integration.created_at', 'DESC')
+      .getMany();
   }
 }

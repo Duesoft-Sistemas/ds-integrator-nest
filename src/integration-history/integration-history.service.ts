@@ -5,9 +5,10 @@ import { IntegrationMappingService } from 'src/integration-mapping/integration-m
 import { Payload } from 'src/jwt/jwt.dto';
 
 import { CreateHistoryDto } from './dtos/create-integration-history.dto';
-import { ErrorDetailsDto, ListHistoryDto } from './integration-history.dtos';
-import { IntegrationHistoryRepository } from './integration-history.repository';
+import { ListHistoryDto } from './dtos/list-integration-history.dto';
+import { ErrorDetailsDto } from './integration-history.dtos';
 import { HistoryMappingResponse, HistoryResponse } from './integration-history.response';
+import { IntegrationHistoryRepository } from './repositories/integration-history.repository';
 
 @Injectable()
 export class IntegrationHistoryService {
