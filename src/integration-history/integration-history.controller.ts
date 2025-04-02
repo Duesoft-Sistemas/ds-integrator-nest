@@ -1,12 +1,8 @@
 import { Body, Controller, Get, Param, Post, Query, Req } from '@nestjs/common';
 import { Request } from 'express';
 
-import {
-  CreateHistoryDto,
-  ErrorDetailsDto,
-  HistoryParamsDto,
-  ListHistoryDto,
-} from './integration-history.dtos';
+import { CreateHistoryDto } from './dtos/create-integration-history.dto';
+import { ErrorDetailsDto, HistoryParamsDto, ListHistoryDto } from './integration-history.dtos';
 import { IntegrationHistoryService } from './integration-history.service';
 
 @Controller('integrations/history')
@@ -17,10 +13,10 @@ export class IntegrationHistoryController {
   async createHistory(
     @Req() req: Request,
     @Param() params: HistoryParamsDto,
-    @Body() data: CreateHistoryDto,
+    @Body() body: CreateHistoryDto,
   ) {
-    const { user } = req;
-    return await this.historyService.create(user, params, data);
+    const data = Object.assign(body, params);
+    return await this.historyService.create(data, req.user);
   }
 
   @Get()

@@ -4,12 +4,8 @@ import { ClientRepository } from 'src/clients/repositories/clients.repository';
 import { IntegrationMappingService } from 'src/integration-mapping/integration-mapping.service';
 import { Payload } from 'src/jwt/jwt.dto';
 
-import {
-  CreateHistoryDto,
-  ErrorDetailsDto,
-  HistoryParamsDto,
-  ListHistoryDto,
-} from './integration-history.dtos';
+import { CreateHistoryDto } from './dtos/create-integration-history.dto';
+import { ErrorDetailsDto, ListHistoryDto } from './integration-history.dtos';
 import { IntegrationHistoryRepository } from './integration-history.repository';
 import { HistoryMappingResponse, HistoryResponse } from './integration-history.response';
 
@@ -21,12 +17,8 @@ export class IntegrationHistoryService {
     private readonly mappingService: IntegrationMappingService,
   ) {}
 
-  async create(
-    user: Payload,
-    params: HistoryParamsDto,
-    data: CreateHistoryDto,
-  ): Promise<Partial<IntegrationHistory>> {
-    const { clientId, integrationKey } = params;
+  async create(data: CreateHistoryDto, user: Payload): Promise<Partial<IntegrationHistory>> {
+    const { clientId, integrationKey } = data;
 
     const integration = await this.clientRepository.findIntegrationFromClient(
       clientId,
