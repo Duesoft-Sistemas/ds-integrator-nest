@@ -1,3 +1,4 @@
+import useLocale from '@locale';
 import { Exclude, Expose } from 'class-transformer';
 import { User } from 'src/database/core/users/users.entity';
 import {
@@ -15,11 +16,11 @@ export class BaseSchema {
   id: number;
 
   @Expose({ name: 'created_at' })
-  @CreateDateColumn({ name: 'created_at', type: 'timestamptz' })
+  @CreateDateColumn({ name: 'created_at', type: 'timestamptz', default: useLocale() })
   readonly createdAt: Date;
 
   @Expose({ name: 'updated_at' })
-  @UpdateDateColumn({ name: 'updated_at', type: 'timestamptz' })
+  @UpdateDateColumn({ name: 'updated_at', type: 'timestamptz', default: useLocale() })
   readonly updatedAt: Date;
 
   @Exclude()
