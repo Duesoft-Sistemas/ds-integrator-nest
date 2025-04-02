@@ -9,9 +9,7 @@ export class SelfCallService implements OnModuleInit, OnModuleDestroy {
   async callSelf() {
     try {
       const url = 'https://ds-integrator-nest.onrender.com';
-      const response = await fetch(url);
-
-      await response.json();
+      await fetch(url);
     } catch (error) {
       console.error('Erro ao chamar a própria API:', error);
     }
