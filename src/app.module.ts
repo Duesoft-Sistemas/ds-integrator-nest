@@ -13,8 +13,8 @@ import { IntegrationHistoryModule } from './integration-history/integration-hist
 import { IntegrationMappingModule } from './integration-mapping/integration-mapping.module';
 import { IntegrationsModule } from './integrations/integrations.module';
 import { JwtModuleInternal } from './jwt/jwt.module';
-import { UsersModule } from './users/users.module';
 import { SelfCallService } from './self-call/self-call.service';
+import { UsersModule } from './users/users.module';
 
 @Module({
   imports: [
@@ -34,7 +34,7 @@ import { SelfCallService } from './self-call/self-call.service';
     { provide: 'APP_GUARD', useClass: AuthGuard },
     { provide: 'APP_GUARD', useClass: RolesGuard },
     AppService,
-    SelfCallService
+    SelfCallService,
   ],
 })
 export class AppModule {}

@@ -1,12 +1,12 @@
 export enum IntegrationStatus {
   all = 'all',
   active = 'active',
-  stoped = 'stoped',
+  stopped = 'stopped',
   critic = 'critic',
 }
 
 export const IntegrationStatusLabel: Partial<Record<IntegrationStatus, string>> = {
   [IntegrationStatus.active]: 'Ativo',
-  [IntegrationStatus.stoped]: 'Parado',
+  [IntegrationStatus.stopped]: 'Parado',
   [IntegrationStatus.critic]: 'Critico',
 };

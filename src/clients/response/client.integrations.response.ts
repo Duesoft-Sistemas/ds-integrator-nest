@@ -34,7 +34,7 @@ export class ClientIntegrationResponse extends BaseClient {
         dateDiff <= 1
           ? IntegrationStatus.active
           : dateDiff <= 12
-            ? IntegrationStatus.stoped
+            ? IntegrationStatus.stopped
             : IntegrationStatus.critic;
 
       return {
