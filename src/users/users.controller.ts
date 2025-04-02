@@ -1,4 +1,6 @@
+import { UserRole } from '@entities/users/users.role';
 import { Public } from '@metadata/public.metadata';
+import { Roles } from '@metadata/role.decorator';
 import { Body, Controller, Post, Req, UnauthorizedException } from '@nestjs/common';
 import { Request } from 'express';
 
@@ -21,6 +23,7 @@ export class UsersController {
     return await this.usersService.createAdmin(rest);
   }
 
+  @Roles([UserRole.admin])
   @Post()
   async createUser(@Req() req: Request, @Body() data: CreateUserDto) {
     return await this.usersService.create(data, req.user);
