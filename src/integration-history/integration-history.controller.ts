@@ -21,7 +21,8 @@ export class IntegrationHistoryController {
   }
 
   @Get()
-  async list(@Query() query: ListHistoryDto) {
+  async list(@Req() req: Request, @Query() query: ListHistoryDto) {
+    query.clientId = req.user.clientId || query.clientId;
     return await this.historyService.list(query);
   }
 

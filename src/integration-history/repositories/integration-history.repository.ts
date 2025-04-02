@@ -21,11 +21,11 @@ export class IntegrationHistoryRepository extends Repository<IntegrationHistory>
     }
 
     if (clientId) {
-      wheres.push(`client.id = ${clientId}`);
+      wheres.push(`clientIntegration.client_id = ${clientId}`);
     }
 
     if (integrationId) {
-      wheres.push(`history.client_integration_id = ${integrationId}`);
+      wheres.push(`clientIntegration.integration_id = ${integrationId}`);
     }
 
     return this.createQueryBuilder('history')
