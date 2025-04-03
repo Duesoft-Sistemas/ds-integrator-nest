@@ -39,7 +39,7 @@ export class IntegrationHistoryRepository extends Repository<IntegrationHistory>
 
   async findById(id: number): Promise<IntegrationHistory | null> {
     return await this.createQueryBuilder('history')
-      .where('id = :id', { id })
+      .where('history.id = :id', { id })
       .leftJoinAndSelect('history.integration', 'clientIntegration')
       .leftJoinAndSelect('clientIntegration.client', 'client')
       .leftJoinAndSelect('clientIntegration.integration', 'integration')
