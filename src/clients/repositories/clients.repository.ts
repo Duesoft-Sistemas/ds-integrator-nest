@@ -7,7 +7,8 @@ import { Injectable, InternalServerErrorException, NotFoundException } from '@ne
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource, Raw, Repository } from 'typeorm';
 
-import { CreateClientDto, ListClientDto } from '../clients.dtos';
+import { ListClientDto } from '../clients.dtos';
+import { CreateClientDto } from '../dtos/create-client.dto';
 import { ListIntegrationDto } from '../dtos/list.integration.polling.dto';
 
 @Injectable()

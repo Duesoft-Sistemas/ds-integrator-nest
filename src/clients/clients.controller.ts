@@ -13,34 +13,87 @@ import {
   Put,
   Query,
   Req,
+  UploadedFile,
+  UseInterceptors,
 } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { Request } from 'express';
+import { unlink } from 'fs/promises';
+import { diskStorage } from 'multer';
+import { extname } from 'path';
 
-import {
-  CreateClientDto,
-  DeleteClientDto,
-  FindClientDto,
-  ListClientDto,
-  UpdateClientDto,
-} from './clients.dtos';
+import { DeleteClientDto, FindClientDto, ListClientDto } from './clients.dtos';
 import { ClientsService } from './clients.service';
+import { CreateClientDto } from './dtos/create-client.dto';
 import { IntegrationStatus } from './dtos/integration.status.enum';
+import { UpdateClientDto } from './dtos/update-client.dto';
 
 @Controller('clients')
 export class ClientsController {
-  constructor(private readonly clientsService: ClientsService) {}
+  constructor(
+    private readonly configService: ConfigService,
+    private readonly clientsService: ClientsService,
+  ) {}
 
   @Roles([UserRole.admin])
   @Post()
-  async createClient(@Req() req: Request, @Body() data: CreateClientDto) {
-    const { user } = req;
-    return await this.clientsService.create(data, user);
+  @UseInterceptors(
+    FileInterceptor('photo', {
+      storage: diskStorage({
+        destination: './uploads/user',
+        filename: (req, file, cb) => {
+          const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
+          const ext = extname(file.originalname);
+          cb(null, `${uniqueSuffix}${ext}`);
+        },
+      }),
+    }),
+  )
+  async createClient(
+    @Req() req: Request,
+    @UploadedFile() file: Express.Multer.File,
+    @Body() data: CreateClientDto,
+  ) {
+    try {
+      const appUrl = this.configService.get<string>('APP_URL');
+      data.photo = file ? `${appUrl}/${file.path.replace(/\\/g, '/')}` : undefined;
+
+      return await this.clientsService.create(data, req.user);
+    } catch (ex) {
+      await (file && unlink(file.path));
+      throw ex;
+    }
   }
 
   @Roles([UserRole.admin])
   @Put(':id')
-  async updateClient(@Param('id', ParseIntPipe) id: number, @Body() data: UpdateClientDto) {
-    return await this.clientsService.update(id, data);
+  @UseInterceptors(
+    FileInterceptor('photo', {
+      storage: diskStorage({
+        destination: './uploads/user',
+        filename: (req, file, cb) => {
+          const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
+          const ext = extname(file.originalname);
+          cb(null, `${uniqueSuffix}${ext}`);
+        },
+      }),
+    }),
+  )
+  async updateClient(
+    @Param('id', ParseIntPipe) id: number,
+    @UploadedFile() file: Express.Multer.File,
+    @Body() data: UpdateClientDto,
+  ) {
+    try {
+      const appUrl = this.configService.get<string>('APP_URL');
+      data.photo = file ? `${appUrl}/${file.path.replace(/\\/g, '/')}` : undefined;
+
+      return await this.clientsService.update(id, data);
+    } catch (ex) {
+      await (file && unlink(file.path));
+      throw ex;
+    }
   }
 
   @Roles([UserRole.admin])

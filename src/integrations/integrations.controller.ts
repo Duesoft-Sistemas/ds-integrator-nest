@@ -11,6 +11,7 @@ import {
   UploadedFile,
   UseInterceptors,
 } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { Request } from 'express';
 import { unlink } from 'fs/promises';
@@ -22,9 +23,10 @@ import { IntegrationsService } from './integrations.service';
 
 @Controller('integrations')
 export class IntegrationsController {
-  private readonly appUrl = process.env.APP_URL || 'http://localhost:3000';
-
-  constructor(private readonly integrationsService: IntegrationsService) {}
+  constructor(
+    private readonly configService: ConfigService,
+    private readonly integrationsService: IntegrationsService,
+  ) {}
 
   @Post()
   @UseInterceptors(
@@ -46,7 +48,9 @@ export class IntegrationsController {
   ) {
     try {
       const { user } = req;
-      data.photo = file ? `${this.appUrl}/${file.path.replace(/\\/g, '/')}` : undefined;
+
+      const appUrl = this.configService.get<string>('APP_URL');
+      data.photo = file ? `${appUrl}/${file.path.replace(/\\/g, '/')}` : undefined;
 
       return await this.integrationsService.create(data, user);
     } catch (ex) {
@@ -69,12 +73,13 @@ export class IntegrationsController {
     }),
   )
   async updateIntegration(
+    @Param('id', ParseIntPipe) id: number,
     @UploadedFile() file: Express.Multer.File,
     @Body() data: UpdateIntegrationDto,
-    @Param('id', ParseIntPipe) id: number,
   ) {
     try {
-      data.photo = file ? `${this.appUrl}/${file.path.replace(/\\/g, '/')}` : undefined;
+      const appUrl = this.configService.get<string>('APP_URL');
+      data.photo = file ? `${appUrl}/${file.path.replace(/\\/g, '/')}` : undefined;
 
       return await this.integrationsService.update(id, data);
     } catch (ex) {

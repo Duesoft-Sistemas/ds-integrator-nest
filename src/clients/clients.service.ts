@@ -8,22 +8,18 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectDataSource } from '@nestjs/typeorm';
-import { instanceToPlain } from 'class-transformer';
+import { instanceToPlain, plainToClass } from 'class-transformer';
 import * as _ from 'lodash';
-import {
-  CreateClientDto,
-  DeleteClientDto,
-  FindClientDto,
-  ListClientDto,
-  UpdateClientDto,
-} from 'src/clients/clients.dtos';
+import { DeleteClientDto, FindClientDto, ListClientDto } from 'src/clients/clients.dtos';
 import { CryptoService } from 'src/crypto/crypto.service';
 import { Payload } from 'src/jwt/jwt.dto';
 import { UserRepository } from 'src/users/users.repository';
 import { DataSource, Not } from 'typeorm';
 
+import { CreateClientDto } from './dtos/create-client.dto';
 import { IntegrationPollingDto } from './dtos/integration.polling.dto';
 import { ListIntegrationDto } from './dtos/list.integration.polling.dto';
+import { UpdateClientDto } from './dtos/update-client.dto';
 import { ClientIntegrationRepository } from './repositories/client.integrations.repository';
 import { ClientRepository } from './repositories/clients.repository';
 import { ClientIntegrationResponse } from './response/client.integrations.response';
@@ -59,14 +55,18 @@ export class ClientsService {
   }
 
   async update(id: number, data: UpdateClientDto): Promise<Partial<Client>> {
-    const { integrations: integrationIds } = data;
+    const { integrations: integrationIds = [] } = data;
 
-    let client = await this.clientRepository.findOne({
-      where: { id: Not(id), cnpj: data.cnpj },
-    });
+    let client: Client | null;
 
-    if (client) {
-      throw new ConflictException(`Cliente com CNPJ ${client.cnpj} já registrado`);
+    if (data.cnpj) {
+      client = await this.clientRepository.findOne({
+        where: { id: Not(id), cnpj: data.cnpj },
+      });
+
+      if (client) {
+        throw new ConflictException(`Cliente com CNPJ ${client.cnpj} já registrado`);
+      }
     }
 
     client = await this.clientRepository.findById(id);
@@ -80,22 +80,31 @@ export class ClientsService {
     await queryRunner.startTransaction();
 
     try {
-      const integrationsToDelete = client.integrations;
+      Object.keys(data).forEach((key) => {
+        if (data[key]) {
+          if (Object.prototype.hasOwnProperty.call(client, key)) {
+            client[key] = data[key];
+          }
 
-      client.cnpj = data.cnpj;
-      client.name = data.name;
-      client.profile.name = data.name;
-      client.profile.email = data.email;
-      client.integrations = integrationIds.map((integrationId) => ({
-        integrationId,
-      })) as ClientIntegrations[];
+          if (Object.prototype.hasOwnProperty.call(client.profile, key)) {
+            client.profile[key] = data[key];
+          }
+        }
+      });
 
-      await queryRunner.manager.delete(ClientIntegrations, integrationsToDelete);
+      if (integrationIds.length > 0) {
+        await queryRunner.manager.delete(ClientIntegrations, client.integrations);
+
+        client.integrations = integrationIds.map((integrationId) => ({
+          integrationId,
+        })) as ClientIntegrations[];
+      }
+
       await queryRunner.manager.save(client);
       await queryRunner.manager.save(client.profile);
 
       await queryRunner.commitTransaction();
-      return _.omit(client, 'profile', 'integrations');
+      return plainToClass(Client, _.omit(client, 'profile', 'integrations'));
     } catch (ex) {
       await queryRunner.rollbackTransaction();
 
