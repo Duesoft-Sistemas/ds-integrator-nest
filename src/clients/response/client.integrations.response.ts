@@ -3,11 +3,13 @@ import { Integration } from '@entities/integration/integration.entity';
 import useLocale from '@locale';
 import { OmitType } from '@nestjs/swagger';
 import { Expose, Type } from 'class-transformer';
-import { differenceInHours } from 'date-fns';
+import { differenceInMinutes } from 'date-fns';
 
 import { IntegrationStatus } from '../dtos/integration.status.enum';
 
-class BaseClient extends OmitType(Client, ['integrations']) {}
+class BaseClient extends OmitType(Client, ['integrations']) {
+  photo?: string;
+}
 
 class IntegrationResponse extends Integration {
   @Expose({ name: 'last_polling' })
@@ -24,16 +26,17 @@ export class ClientIntegrationResponse extends BaseClient {
   constructor(source: Client) {
     super();
 
-    const { integrations, ...client } = source;
+    const { profile, integrations, ...client } = source;
 
-    Object.assign(this, client);
+    Object.assign(this, { ...client, photo: profile.photo });
 
     this.integrations = integrations.map(({ integration, lastPolling }) => {
-      const dateDiff = differenceInHours(useLocale(), lastPolling);
+      const dateDiff = differenceInMinutes(useLocale(), lastPolling);
+
       const status: IntegrationStatus =
-        dateDiff <= 1
+        dateDiff <= 30
           ? IntegrationStatus.active
-          : dateDiff <= 12
+          : dateDiff <= 60
             ? IntegrationStatus.stopped
             : IntegrationStatus.critic;
 

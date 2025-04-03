@@ -108,6 +108,7 @@ export class ClientRepository extends Repository<Client> {
 
     return await this.createQueryBuilder('client')
       .where(wheres.join(' AND '))
+      .leftJoinAndSelect('client.profile', 'profile')
       .leftJoinAndSelect('client.integrations', 'clientIntegration')
       .leftJoinAndSelect('clientIntegration.integration', 'integration')
       .orderBy('integration.created_at', 'DESC')
