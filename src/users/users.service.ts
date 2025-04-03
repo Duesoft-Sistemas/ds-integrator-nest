@@ -1,10 +1,10 @@
 import { User } from '@entities/users/users.entity';
 import { UserRole } from '@entities/users/users.role';
-import { ConflictException, Injectable } from '@nestjs/common';
+import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Payload } from 'src/jwt/jwt.dto';
-import { Repository } from 'typeorm';
+import { Not, Repository } from 'typeorm';
 
 import { CreateUserDto } from './users.dtos';
 
@@ -12,7 +12,7 @@ import { CreateUserDto } from './users.dtos';
 export class UsersService {
   constructor(
     private readonly configService: ConfigService,
-    @InjectRepository(User) private usersRepository: Repository<User>,
+    @InjectRepository(User) private repository: Repository<User>,
   ) {}
 
   validDevice(deviceId: string): boolean {
@@ -22,7 +22,7 @@ export class UsersService {
   }
 
   async findByEmail(email: string): Promise<User | null> {
-    return await this.usersRepository.findOne({
+    return await this.repository.findOne({
       where: { email },
       relations: ['client'],
     });
@@ -35,10 +35,10 @@ export class UsersService {
       throw new ConflictException(`O e-mail ${register.email} já existe`);
     }
 
-    register = this.usersRepository.create(data);
+    register = this.repository.create(data);
     register.isAdmin = true;
     register.roles = [UserRole.admin];
-    return await this.usersRepository.save(register);
+    return await this.repository.save(register);
   }
 
   async create(data: CreateUserDto, user: Payload): Promise<User> {
@@ -50,9 +50,34 @@ export class UsersService {
       throw new ConflictException(`O e-mail ${register.email} já existe`);
     }
 
-    register = this.usersRepository.create(data);
+    register = this.repository.create(data);
     register.userId = user.id;
     register.roles = [UserRole.support];
-    return await this.usersRepository.save(register);
+    return await this.repository.save(register);
+  }
+
+  async update(id: number, data: CreateUserDto): Promise<User> {
+    const { email } = data;
+
+    const register = await this.repository.findOneBy({ id });
+
+    if (!register) {
+      throw new NotFoundException(`Registro ID ${id} não encontrado`);
+    }
+
+    const match = await this.repository.findOneBy({ id: Not(id), email });
+
+    if (match) {
+      throw new ConflictException(`Usuário com email ${email} já cadastrado`);
+    }
+
+    Object.keys(data).forEach((key) => {
+      if (Object.prototype.hasOwnProperty.call(register, key)) {
+        register[key] = data[key];
+      }
+    });
+
+    await this.repository.save(register);
+    return register;
   }
 }

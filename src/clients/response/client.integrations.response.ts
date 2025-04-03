@@ -33,17 +33,15 @@ export class ClientIntegrationResponse extends BaseClient {
     this.integrations = integrations.map(({ integration, lastPolling }) => {
       const dateDiff = differenceInMinutes(useLocale(), lastPolling);
 
-      const status: IntegrationStatus =
-        dateDiff <= 30
-          ? IntegrationStatus.active
-          : dateDiff <= 60
-            ? IntegrationStatus.stopped
-            : IntegrationStatus.critic;
-
       return {
         ...integration,
-        status,
         lastPolling,
+        status:
+          dateDiff <= 30
+            ? IntegrationStatus.active
+            : dateDiff <= 60
+              ? IntegrationStatus.stopped
+              : IntegrationStatus.critic,
       };
     });
   }

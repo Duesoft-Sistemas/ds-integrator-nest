@@ -1,7 +1,16 @@
 import { UserRole } from '@entities/users/users.role';
 import { Public } from '@metadata/public.metadata';
 import { Roles } from '@metadata/role.decorator';
-import { Body, Controller, Post, Req, UnauthorizedException } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Param,
+  ParseIntPipe,
+  Post,
+  Put,
+  Req,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { Request } from 'express';
 
 import { CreateUserAdminDto, CreateUserDto } from './users.dtos';
@@ -25,7 +34,13 @@ export class UsersController {
 
   @Roles([UserRole.admin])
   @Post()
-  async createUser(@Req() req: Request, @Body() data: CreateUserDto) {
+  async create(@Req() req: Request, @Body() data: CreateUserDto) {
     return await this.usersService.create(data, req.user);
+  }
+
+  @Roles([UserRole.admin])
+  @Put(':id')
+  async update(@Param('id', ParseIntPipe) id: number, @Body() data: CreateUserDto) {
+    return await this.usersService.update(id, data);
   }
 }
