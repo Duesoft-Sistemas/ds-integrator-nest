@@ -1,6 +1,6 @@
 import { IntegrationHistoryType } from '@entities/integration-history/history.type.enum';
 import { Expose, Transform } from 'class-transformer';
-import { IsEnum, IsNumber, IsOptional } from 'class-validator';
+import { IsDateString, IsEnum, IsNumber, IsOptional } from 'class-validator';
 
 export class ListHistoryDto {
   @Transform(
@@ -21,4 +21,14 @@ export class ListHistoryDto {
   @IsNumber()
   @IsOptional()
   clientId?: number;
+
+  @Expose({ name: 'date_start' })
+  @IsDateString()
+  @IsOptional()
+  dateStart?: string;
+
+  @Expose({ name: 'date_end' })
+  @IsDateString()
+  @IsOptional()
+  dateEnd?: string;
 }

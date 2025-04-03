@@ -12,7 +12,7 @@ export class IntegrationHistoryRepository extends Repository<IntegrationHistory>
   }
 
   async list(data: ListHistoryDto): Promise<IntegrationHistory[]> {
-    const { type, integrationId, clientId } = data;
+    const { type, integrationId, clientId, dateStart, dateEnd } = data;
 
     const wheres: string[] = [];
 
@@ -26,6 +26,14 @@ export class IntegrationHistoryRepository extends Repository<IntegrationHistory>
 
     if (integrationId) {
       wheres.push(`clientIntegration.integration_id = ${integrationId}`);
+    }
+
+    if (dateStart) {
+      wheres.push(`history.created_at::date >= '${dateStart}'`);
+    }
+
+    if (dateEnd) {
+      wheres.push(`history.created_at::date <= '${dateEnd}'`);
     }
 
     return this.createQueryBuilder('history')

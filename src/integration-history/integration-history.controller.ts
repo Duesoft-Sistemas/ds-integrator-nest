@@ -1,4 +1,6 @@
+import useLocale from '@locale';
 import { Body, Controller, Get, Param, Post, Query, Req } from '@nestjs/common';
+import { format } from 'date-fns';
 import { Request } from 'express';
 
 import { CreateHistoryDto } from './dtos/create-integration-history.dto';
@@ -23,6 +25,8 @@ export class IntegrationHistoryController {
   @Get()
   async list(@Req() req: Request, @Query() query: ListHistoryDto) {
     query.clientId = req.user.clientId || query.clientId;
+    query.dateStart = query.dateStart || format(useLocale(), 'yyyy-MM-dd');
+
     return await this.historyService.list(query);
   }
 
