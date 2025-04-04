@@ -31,6 +31,10 @@ export class IntegrationHistory extends BaseSchema {
   @Column({ default: false })
   resolved: boolean;
 
+  @Expose({ name: 'resolved_in' })
+  @Column({ name: 'resolved_in', nullable: true })
+  resolvedIn?: Date;
+
   @Exclude()
   @Column({ name: 'client_integration_id' })
   clientIntegrationId: number;

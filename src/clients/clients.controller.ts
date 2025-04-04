@@ -121,7 +121,7 @@ export class ClientsController {
     query.dateStart = query.dateStart ?? startOfDay(useLocale());
     query.dateEnd = query.dateEnd ?? endOfDay(useLocale());
 
-    return this.clientsService.listIntegrations(query);
+    return await this.clientsService.listIntegrations(query);
   }
 
   // remover quando o front for atualizado
@@ -131,6 +131,6 @@ export class ClientsController {
     query.dateStart = query.dateStart ?? startOfDay(useLocale());
     query.dateEnd = query.dateEnd ?? endOfDay(useLocale());
 
-    return this.clientsService.listIntegrations(query);
+    return await this.clientsService.listIntegrations(query);
   }
 }

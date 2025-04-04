@@ -32,7 +32,7 @@ export class ClientIntegrations extends BaseSchema {
   lastPolling: Date;
 
   @OneToMany(() => IntegrationHistory, (history) => history.clientIntegration)
-  histories?: IntegrationHistory;
+  histories?: IntegrationHistory[];
 
   @Expose({ name: 'errors' })
   errors?: number;

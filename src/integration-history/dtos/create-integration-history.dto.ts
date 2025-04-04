@@ -2,14 +2,14 @@ import { IntegrationKey } from '@entities/integration/integration.key.enum';
 import { IntegrationHistoryEntity } from '@entities/integration-history/history.process.enum';
 import { IntegrationHistoryType } from '@entities/integration-history/history.type.enum';
 import { Expose } from 'class-transformer';
-import { IsEnum, IsNotEmpty, IsObject, IsOptional, IsString } from 'class-validator';
+import { IsEnum, IsNotEmpty, IsNumber, IsObject, IsOptional, IsString } from 'class-validator';
 
-import { HistoryParamsDto } from '../integration-history.dtos';
-
-export class CreateHistoryDto extends HistoryParamsDto {
+export class CreateHistoryDto {
+  @IsNumber()
   @IsOptional()
   clientId: number;
 
+  @IsEnum(IntegrationKey)
   @IsOptional()
   integrationKey: IntegrationKey;
 

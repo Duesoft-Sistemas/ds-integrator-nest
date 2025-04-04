@@ -119,6 +119,7 @@ export class ClientRepository extends Repository<Client> {
         (qb) =>
           qb
             .where('history.type = :type', { type: IntegrationHistoryType.error })
+            .andWhere('history.resolved = false')
             .andWhere('history.created_at BETWEEN :dateStart AND :dateEnd', { dateStart, dateEnd }),
       )
 

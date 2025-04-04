@@ -29,13 +29,13 @@ export class ClientsService {
   constructor(
     @InjectDataSource() private readonly dataSource: DataSource,
     private readonly cryptoService: CryptoService,
+    private readonly repository: ClientRepository,
     private readonly userRepository: UserRepository,
-    private readonly clientRepository: ClientRepository,
     private readonly clientIntegrationRepository: ClientIntegrationRepository,
   ) {}
 
   async create(data: CreateClientDto, user: Payload): Promise<Client | { password: string }> {
-    let client = await this.clientRepository.findByCnpj(data.cnpj);
+    let client = await this.repository.findByCnpj(data.cnpj);
 
     if (client) {
       throw new ConflictException(`Cliente com CNPJ ${client.cnpj} já registrado`);
@@ -50,7 +50,7 @@ export class ClientsService {
     const password = this.cryptoService.generatePassword();
     const passwordEncrypted = await this.cryptoService.encrypt(password);
 
-    client = await this.clientRepository.register(data, password, user);
+    client = await this.repository.register(data, password, user);
     return { ...client, password: passwordEncrypted };
   }
 
@@ -60,7 +60,7 @@ export class ClientsService {
     let client: Client | null;
 
     if (data.cnpj) {
-      client = await this.clientRepository.findOne({
+      client = await this.repository.findOne({
         where: { id: Not(id), cnpj: data.cnpj },
       });
 
@@ -69,7 +69,7 @@ export class ClientsService {
       }
     }
 
-    client = await this.clientRepository.findById(id);
+    client = await this.repository.findById(id);
 
     if (!client) {
       throw new NotFoundException('Cliente não encontrado');
@@ -119,7 +119,7 @@ export class ClientsService {
   async delete(data: DeleteClientDto): Promise<void> {
     const { id } = data;
 
-    const client = await this.clientRepository.findById(id);
+    const client = await this.repository.findById(id);
 
     if (!client) {
       throw new NotFoundException('Cliente não encontrado');
@@ -149,18 +149,18 @@ export class ClientsService {
       await queryRunner.release();
     }
 
-    await this.clientRepository.update(id, { deletedAt: new Date(), isActive: false });
+    await this.repository.update(id, { deletedAt: new Date(), isActive: false });
   }
 
   async list(data: ListClientDto): Promise<Client[]> {
-    const result = await this.clientRepository.list(data);
+    const result = await this.repository.list(data);
     return instanceToPlain(result) as Client[];
   }
 
   async polling(data: IntegrationPollingDto): Promise<void> {
     const { clientId, integrationKey } = data;
 
-    const client = await this.clientRepository.findOne({
+    const client = await this.repository.findOne({
       where: { id: clientId, integrations: { integration: { key: integrationKey } } },
       relations: ['integrations', 'integrations.integration'],
     });
@@ -183,7 +183,7 @@ export class ClientsService {
   }
 
   async listIntegrations(data: ListIntegrationDto): Promise<ClientIntegrationResponse[]> {
-    const response = await this.clientRepository.listIntegrations(data);
+    const response = await this.repository.listIntegrations(data);
     return response.map((item) => new ClientIntegrationResponse(item));
   }
 }

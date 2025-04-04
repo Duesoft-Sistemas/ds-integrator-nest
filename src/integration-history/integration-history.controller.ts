@@ -1,25 +1,39 @@
+import { IntegrationKey } from '@entities/integration/integration.key.enum';
+import { UserRole } from '@entities/users/users.role';
 import useLocale from '@locale';
-import { Body, Controller, Get, Param, Post, Query, Req } from '@nestjs/common';
+import { Roles } from '@metadata/role.decorator';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  ParseEnumPipe,
+  ParseIntPipe,
+  Post,
+  Put,
+  Query,
+  Req,
+} from '@nestjs/common';
 import { format } from 'date-fns';
 import { Request } from 'express';
 
 import { CreateHistoryDto } from './dtos/create-integration-history.dto';
+import { DetailHistoryDto } from './dtos/detail-history.dto';
 import { ListHistoryDto } from './dtos/list-integration-history.dto';
-import { ErrorDetailsDto, HistoryParamsDto } from './integration-history.dtos';
 import { IntegrationHistoryService } from './integration-history.service';
 
 @Controller('integrations/history')
 export class IntegrationHistoryController {
-  constructor(private readonly historyService: IntegrationHistoryService) {}
+  constructor(private readonly service: IntegrationHistoryService) {}
 
   @Post(':integrationKey/:clientId')
   async createHistory(
     @Req() req: Request,
-    @Param() params: HistoryParamsDto,
-    @Body() body: CreateHistoryDto,
+    @Param('integrationKey', new ParseEnumPipe(IntegrationKey)) integrationKey: IntegrationKey,
+    @Param('clientId', ParseIntPipe) clientId: number,
+    @Body() data: CreateHistoryDto,
   ) {
-    const data = Object.assign(body, params);
-    return await this.historyService.create(data, req.user);
+    return await this.service.create({ ...data, integrationKey, clientId }, req.user);
   }
 
   @Get()
@@ -27,11 +41,17 @@ export class IntegrationHistoryController {
     query.clientId = req.user.clientId || query.clientId;
     query.dateStart = query.dateStart || format(useLocale(), 'yyyy-MM-dd');
 
-    return await this.historyService.list(query);
+    return await this.service.list(query);
   }
 
   @Get(':id/mapping')
-  async mappingError(@Param() params: ErrorDetailsDto) {
-    return await this.historyService.mappingError(params);
+  async mappingError(@Param() params: DetailHistoryDto) {
+    return await this.service.mappingError(params);
+  }
+
+  @Roles([UserRole.admin, UserRole.support])
+  @Put(':id/resolved')
+  async markResolved(@Param('id', ParseIntPipe) id: number) {
+    return await this.service.markResolved({ id });
   }
 }
