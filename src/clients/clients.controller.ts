@@ -123,4 +123,14 @@ export class ClientsController {
 
     return this.clientsService.listIntegrations(query);
   }
+
+  // remover quando o front for atualizado
+  @Get('integrations/all')
+  async listAllIntegrations(@Req() req: Request, @Query() query: ListIntegrationDto) {
+    query.clientId = req.user.clientId ?? query.clientId;
+    query.dateStart = query.dateStart ?? startOfDay(useLocale());
+    query.dateEnd = query.dateEnd ?? endOfDay(useLocale());
+
+    return this.clientsService.listIntegrations(query);
+  }
 }
