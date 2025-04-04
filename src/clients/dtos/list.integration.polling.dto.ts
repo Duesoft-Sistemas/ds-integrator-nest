@@ -1,7 +1,7 @@
 import { Expose, Transform, Type } from 'class-transformer';
 import { IsDate, IsEnum, IsNumber, IsOptional, IsPositive } from 'class-validator';
 
-import { IntegrationStatus } from './integration.status.enum';
+import { IntegrationStatus } from './integration-status.enum';
 
 export class ListIntegrationDto {
   @Expose({ name: 'client_id' })
@@ -10,8 +10,11 @@ export class ListIntegrationDto {
   @IsOptional()
   clientId?: number | null;
 
-  @Transform(({ value }: { value: string }) => value.toLowerCase() as IntegrationStatus)
+  @Transform(({ value }: { value: string }) =>
+    value ? (value.toLowerCase() as IntegrationStatus) : null,
+  )
   @IsEnum(IntegrationStatus)
+  @IsOptional()
   status: IntegrationStatus;
 
   @Expose({ name: 'date_start' })
