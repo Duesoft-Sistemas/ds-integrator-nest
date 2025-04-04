@@ -42,6 +42,7 @@ export class IntegrationHistoryRepository extends Repository<IntegrationHistory>
       .leftJoinAndSelect('clientIntegration.integration', 'integration')
       .where(wheres.join(' AND '))
       .orderBy('history.created_at', 'DESC')
+      .limit(1000)
       .getMany();
   }
 
