@@ -1,5 +1,5 @@
 import { Expose, Transform } from 'class-transformer';
-import { IsBoolean, IsInt, IsNotEmpty, IsOptional, IsString, Matches } from 'class-validator';
+import { IsBoolean, IsInt, IsOptional, IsString } from 'class-validator';
 
 export class DeleteClientDto {
   @Transform(({ value }) => Number.parseInt(value))
@@ -17,11 +17,4 @@ export class ListClientDto {
   @IsString()
   @IsOptional()
   name?: string;
-}
-
-export class FindClientDto {
-  @IsString()
-  @IsNotEmpty()
-  @Matches(/^\d{14}$/, { message: 'deve conter 14 dígitos numéricos' })
-  cnpj: string;
 }

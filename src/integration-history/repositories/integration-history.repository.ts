@@ -37,20 +37,20 @@ export class IntegrationHistoryRepository extends Repository<IntegrationHistory>
     }
 
     return this.createQueryBuilder('history')
-      .where(wheres.join(' AND '))
-      .leftJoinAndSelect('history.integration', 'clientIntegration')
+      .leftJoinAndSelect('history.clientIntegration', 'clientIntegration')
       .leftJoinAndSelect('clientIntegration.client', 'client')
       .leftJoinAndSelect('clientIntegration.integration', 'integration')
+      .where(wheres.join(' AND '))
       .orderBy('history.created_at', 'DESC')
       .getMany();
   }
 
   async findById(id: number): Promise<IntegrationHistory | null> {
     return await this.createQueryBuilder('history')
-      .where('history.id = :id', { id })
-      .leftJoinAndSelect('history.integration', 'clientIntegration')
+      .leftJoinAndSelect('history.clientIntegration', 'clientIntegration')
       .leftJoinAndSelect('clientIntegration.client', 'client')
       .leftJoinAndSelect('clientIntegration.integration', 'integration')
+      .where('history.id = :id', { id })
       .getOne();
   }
 }

@@ -5,7 +5,7 @@ import { OmitType } from '@nestjs/swagger';
 import { Exclude, Expose, Type } from 'class-transformer';
 import * as _ from 'lodash';
 
-export class HistoryResponse extends OmitType(IntegrationHistory, ['integration']) {
+export class HistoryResponse extends OmitType(IntegrationHistory, ['clientIntegration']) {
   @Expose({ name: 'integration_id' })
   integrationId: number;
 
@@ -24,17 +24,17 @@ export class HistoryResponse extends OmitType(IntegrationHistory, ['integration'
   constructor(source: IntegrationHistory) {
     super();
 
-    const { integration, ...register } = source;
+    const { clientIntegration, ...register } = source;
 
     Object.assign(this, register);
 
-    this.integrationId = _.get(integration, 'integration.id');
-    this.integrationName = _.get(integration, 'integration.name');
-    this.client = _.get(integration, 'client');
+    this.integrationId = _.get(clientIntegration, 'integration.id');
+    this.integrationName = _.get(clientIntegration, 'integration.name');
+    this.client = _.get(clientIntegration, 'client');
   }
 }
 
-export class HistoryMappingResponse extends OmitType(IntegrationHistory, ['integration']) {
+export class HistoryMappingResponse extends OmitType(IntegrationHistory, ['clientIntegration']) {
   @Expose({ name: 'entity_label' })
   entityLabel: string;
 
@@ -51,13 +51,13 @@ export class HistoryMappingResponse extends OmitType(IntegrationHistory, ['integ
   constructor(source: IntegrationHistory) {
     super();
 
-    const { integration, ...register } = source;
+    const { clientIntegration, ...register } = source;
 
     Object.assign(this, register);
 
-    this.client = _.get(integration, 'client');
-    this.integrationId = _.get(integration, 'integration.id');
-    this.integrationName = _.get(integration, 'integration.name');
+    this.client = _.get(clientIntegration, 'client');
+    this.integrationId = _.get(clientIntegration, 'integration.id');
+    this.integrationName = _.get(clientIntegration, 'integration.name');
 
     switch (this.entity) {
       case IntegrationHistoryEntity.category:

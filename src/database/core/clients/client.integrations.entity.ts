@@ -1,8 +1,9 @@
 import { BaseSchema } from '@entities/base.schema';
 import { Client } from '@entities/clients/clients.entity';
 import { Integration } from '@entities/integration/integration.entity';
+import { IntegrationHistory } from '@entities/integration-history/history.entity';
 import { Expose } from 'class-transformer';
-import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
 
 @Entity({ name: 'client_integrations' })
 export class ClientIntegrations extends BaseSchema {
@@ -29,4 +30,10 @@ export class ClientIntegrations extends BaseSchema {
   @Expose({ name: 'last_polling' })
   @Column({ name: 'last_polling', nullable: true })
   lastPolling: Date;
+
+  @OneToMany(() => IntegrationHistory, (history) => history.clientIntegration)
+  histories?: IntegrationHistory;
+
+  @Expose({ name: 'errors' })
+  errors?: number;
 }

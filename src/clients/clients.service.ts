@@ -10,7 +10,7 @@ import {
 import { InjectDataSource } from '@nestjs/typeorm';
 import { instanceToPlain, plainToClass } from 'class-transformer';
 import * as _ from 'lodash';
-import { DeleteClientDto, FindClientDto, ListClientDto } from 'src/clients/clients.dtos';
+import { DeleteClientDto, ListClientDto } from 'src/clients/clients.dtos';
 import { CryptoService } from 'src/crypto/crypto.service';
 import { Payload } from 'src/jwt/jwt.dto';
 import { UserRepository } from 'src/users/users.repository';
@@ -155,16 +155,6 @@ export class ClientsService {
   async list(data: ListClientDto): Promise<Client[]> {
     const result = await this.clientRepository.list(data);
     return instanceToPlain(result) as Client[];
-  }
-
-  async findByCnpj(data: FindClientDto): Promise<Client> {
-    const { cnpj } = data;
-
-    const client = await this.clientRepository.findByCnpj(cnpj);
-
-    if (!client) throw new NotFoundException(`Cliente com CNPJ ${cnpj} não encontrado`);
-
-    return instanceToPlain(client) as Client;
   }
 
   async polling(data: IntegrationPollingDto): Promise<void> {

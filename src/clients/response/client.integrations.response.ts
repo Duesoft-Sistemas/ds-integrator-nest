@@ -23,15 +23,23 @@ export class ClientIntegrationResponse extends BaseClient {
   @Expose({ name: 'integrations' })
   integrations: IntegrationResponse[];
 
+  errors: number;
+
   constructor(source: Client) {
     super();
 
     const { profile, integrations, ...client } = source;
 
-    Object.assign(this, { ...client, photo: profile.photo });
+    Object.assign(this, {
+      ...client,
+      errors: 0,
+      photo: profile.photo,
+    });
 
-    this.integrations = integrations.map(({ integration, lastPolling }) => {
+    this.integrations = integrations.map(({ integration, lastPolling, errors = 0 }) => {
       const dateDiff = differenceInMinutes(useLocale(), lastPolling);
+
+      this.errors += errors;
 
       return {
         ...integration,

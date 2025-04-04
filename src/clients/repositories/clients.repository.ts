@@ -1,6 +1,7 @@
 import { ClientIntegrations } from '@entities/clients/client.integrations.entity';
 import { Client } from '@entities/clients/clients.entity';
 import { IntegrationKey } from '@entities/integration/integration.key.enum';
+import { IntegrationHistoryType } from '@entities/integration-history/history.type.enum';
 import { User } from '@entities/users/users.entity';
 import { UserRole } from '@entities/users/users.role';
 import { Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
@@ -95,7 +96,7 @@ export class ClientRepository extends Repository<Client> {
   }
 
   async listIntegrations(data: ListIntegrationDto) {
-    const { clientId } = data;
+    const { clientId, dateStart, dateEnd } = data;
 
     const wheres: string[] = [
       'client.is_active = true',
@@ -107,10 +108,21 @@ export class ClientRepository extends Repository<Client> {
     }
 
     return await this.createQueryBuilder('client')
-      .where(wheres.join(' AND '))
       .leftJoinAndSelect('client.profile', 'profile')
       .leftJoinAndSelect('client.integrations', 'clientIntegration')
       .leftJoinAndSelect('clientIntegration.integration', 'integration')
+
+      .loadRelationCountAndMap(
+        'clientIntegration.errors',
+        'clientIntegration.histories',
+        'history',
+        (qb) =>
+          qb
+            .where('history.type = :type', { type: IntegrationHistoryType.error })
+            .andWhere('history.created_at BETWEEN :dateStart AND :dateEnd', { dateStart, dateEnd }),
+      )
+
+      .where(wheres.join(' AND '))
       .orderBy('integration.created_at', 'DESC')
       .getMany();
   }
