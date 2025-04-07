@@ -3,9 +3,9 @@ import { ConfigModule } from '@nestjs/config';
 
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { AuthGuard } from './auth/auth.guard';
 import { AuthModule } from './auth/auth.module';
-import { RolesGuard } from './auth/role.guard';
+import { AuthGuard } from './auth/guards/auth.guard';
+import { RolesGuard } from './auth/guards/role.guard';
 import { ClientsModule } from './clients/clients.module';
 import { CryptoModule } from './crypto/crypto.module';
 import { DatabaseModule } from './database/databse.module';

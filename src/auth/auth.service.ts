@@ -4,7 +4,8 @@ import { Payload } from 'src/jwt/jwt.dto';
 import { JwtServiceInternal } from 'src/jwt/jwt.service';
 import { UsersService } from 'src/users/users.service';
 
-import { LoginResponse } from './auth.response';
+import { SignInDto } from './dtos/sign-in.dto';
+import { LoginResponse } from './response/sign-in.response.dto';
 
 @Injectable()
 export class AuthService {
@@ -13,7 +14,9 @@ export class AuthService {
     private readonly usersService: UsersService,
   ) {}
 
-  async signIn(email: string, password: string): Promise<LoginResponse> {
+  async signIn(data: SignInDto): Promise<LoginResponse> {
+    const { email, password } = data;
+
     const user = await this.usersService.findByEmail(email);
 
     if (!user || !(await bcrypt.compare(password, user.password))) {
