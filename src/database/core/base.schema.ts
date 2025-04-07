@@ -16,12 +16,12 @@ export class BaseSchema {
   id: number;
 
   @Expose({ name: 'created_at' })
-  @CreateDateColumn({ name: 'created_at', type: 'timestamptz', default: useLocale() })
-  readonly createdAt: Date;
+  @CreateDateColumn({ name: 'created_at', type: 'timestamptz' })
+  readonly createdAt: Date = useLocale();
 
   @Expose({ name: 'updated_at' })
-  @UpdateDateColumn({ name: 'updated_at', type: 'timestamptz', default: useLocale() })
-  readonly updatedAt: Date;
+  @UpdateDateColumn({ name: 'updated_at', type: 'timestamptz' })
+  readonly updatedAt: Date = useLocale();
 
   @Exclude()
   @DeleteDateColumn({ name: 'deleted_at', type: 'timestamptz' })
