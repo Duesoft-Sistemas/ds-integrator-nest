@@ -24,10 +24,10 @@ import { UsersModule } from './users/users.module';
     AuthModule,
     UsersModule,
     ClientsModule,
-    IntegrationsModule,
     CryptoModule,
     IntegrationHistoryModule,
     IntegrationMappingModule,
+    IntegrationsModule,
   ],
   controllers: [AppController],
   providers: [

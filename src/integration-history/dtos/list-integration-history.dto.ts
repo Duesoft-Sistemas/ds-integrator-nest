@@ -6,8 +6,8 @@ export class ListHistoryDto {
   @Transform(
     ({ value }: { value: string }) => value && (value.toUpperCase() as IntegrationHistoryType),
   )
-  @IsOptional()
   @IsEnum(IntegrationHistoryType)
+  @IsOptional()
   type?: IntegrationHistoryType;
 
   @Expose({ name: 'integration_id' })
