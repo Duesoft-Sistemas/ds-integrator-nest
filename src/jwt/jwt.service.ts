@@ -24,7 +24,7 @@ export class JwtServiceInternal {
     });
     const decoded = this.jwtService.decode(token);
 
-    console.log(payload.email, secret, token);
+    console.log('generateToken', payload.email, secret, token);
     return { token, expiresIn: new Date(decoded.exp * 1000) };
   }
 
@@ -32,7 +32,7 @@ export class JwtServiceInternal {
     const secret = this.configService.get<string>(`JWT_${type.toUpperCase()}_TOKEN_SECRET`);
     const payload = await this.jwtService.verifyAsync<Payload>(token, { secret });
 
-    console.log(payload.email, secret, token);
+    console.log('verifyToken', payload.email, secret, token);
 
     return payload;
   }
