@@ -3,7 +3,7 @@ import { Integration } from '@entities/integration/integration.entity';
 import useLocale from '@locale';
 import { OmitType } from '@nestjs/swagger';
 import { Expose, Type } from 'class-transformer';
-import { differenceInMinutes } from 'date-fns';
+import { differenceInDays, differenceInHours, differenceInMinutes } from 'date-fns';
 
 import { IntegrationStatus } from '../dtos/integration-status.enum';
 
@@ -33,18 +33,30 @@ export class ClientIntegrationResponse extends BaseClient {
     Object.assign(this, { ...client, photo: profile.photo });
 
     this.integrations = integrations.map(({ integration, lastPolling, errors = 0 }) => {
-      const dateDiff = differenceInMinutes(useLocale(), lastPolling);
+      const now = useLocale();
+      const minutesDiff = differenceInMinutes(now, lastPolling),
+        hoursDiff = differenceInHours(now, lastPolling),
+        daysDiff = differenceInDays(now, lastPolling);
+
+      let status: IntegrationStatus, label: string;
+
+      if (minutesDiff <= 30) {
+        status = IntegrationStatus.active;
+        label = `há ${minutesDiff} minutos`;
+      } else if (minutesDiff <= 60) {
+        status = IntegrationStatus.stopped;
+        label = `há ${minutesDiff} minutos`;
+      } else {
+        status = IntegrationStatus.critic;
+        label = daysDiff ? `há ${daysDiff} dias` : `há ${hoursDiff} horas`;
+      }
 
       return {
         ...integration,
         errors,
+        label,
+        status,
         lastPolling,
-        status:
-          dateDiff <= 30
-            ? IntegrationStatus.active
-            : dateDiff <= 60
-              ? IntegrationStatus.stopped
-              : IntegrationStatus.critic,
       };
     });
   }
