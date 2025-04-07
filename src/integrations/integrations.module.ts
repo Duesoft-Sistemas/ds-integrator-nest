@@ -4,11 +4,12 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { IntegrationsController } from './integrations.controller';
 import { IntegrationsService } from './integrations.service';
+import { IntegrationRepository } from './repositories/integrations.repository';
 
 @Module({
   imports: [TypeOrmModule.forFeature([Integration])],
   controllers: [IntegrationsController],
-  providers: [IntegrationsService],
+  providers: [IntegrationRepository, IntegrationsService],
   exports: [IntegrationsService],
 })
 export class IntegrationsModule {}

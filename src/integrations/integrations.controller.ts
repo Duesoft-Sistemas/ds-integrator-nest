@@ -1,9 +1,11 @@
+import { IntegrationKey } from '@entities/integration/integration.key.enum';
 import {
   Body,
   Controller,
   Delete,
   Get,
   Param,
+  ParseEnumPipe,
   ParseIntPipe,
   Post,
   Put,
@@ -25,7 +27,7 @@ import { IntegrationsService } from './integrations.service';
 export class IntegrationsController {
   constructor(
     private readonly configService: ConfigService,
-    private readonly integrationsService: IntegrationsService,
+    private readonly service: IntegrationsService,
   ) {}
 
   @Post()
@@ -52,7 +54,7 @@ export class IntegrationsController {
       const appUrl = this.configService.get<string>('APP_URL');
       data.photo = file ? `${appUrl}/${file.path.replace(/\\/g, '/')}` : undefined;
 
-      return await this.integrationsService.create(data, user);
+      return await this.service.create(data, user);
     } catch (ex) {
       await (file && unlink(file.path));
       throw ex;
@@ -81,7 +83,7 @@ export class IntegrationsController {
       const appUrl = this.configService.get<string>('APP_URL');
       data.photo = file ? `${appUrl}/${file.path.replace(/\\/g, '/')}` : undefined;
 
-      return await this.integrationsService.update(id, data);
+      return await this.service.update(id, data);
     } catch (ex) {
       await (file && unlink(file.path));
       throw ex;
@@ -90,11 +92,16 @@ export class IntegrationsController {
 
   @Delete(':id')
   async deleteIntegration(@Param('id', ParseIntPipe) id: number) {
-    return await this.integrationsService.delete(id);
+    return await this.service.delete(id);
   }
 
   @Get()
   async listIntegrations() {
-    return await this.integrationsService.list();
+    return await this.service.list();
+  }
+
+  @Get(':key')
+  async findByKey(@Param('key', new ParseEnumPipe(IntegrationKey)) key: IntegrationKey) {
+    return await this.service.find({ key });
   }
 }
