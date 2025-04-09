@@ -1,4 +1,3 @@
-import useLocale from '@locale';
 import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { Request } from 'express';
@@ -25,15 +24,13 @@ export class AuthGuard implements CanActivate {
     const token = this.extractTokenFromHeader(request);
 
     if (!token) {
-      console.log(useLocale(), 'Token não informado');
       throw new UnauthorizedException('Token não informado');
     }
 
     try {
       const payload = await this.jwtService.verifyToken('access', token);
       request.user = payload;
-    } catch (err) {
-      console.log(useLocale(), `Token inválido: ${(err as Error).message}`);
+    } catch {
       throw new UnauthorizedException('Token inválido');
     }
 
