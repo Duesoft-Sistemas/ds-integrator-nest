@@ -1,5 +1,6 @@
 import { ClientIntegrations } from '@entities/clients/client.integrations.entity';
 import { Client } from '@entities/clients/clients.entity';
+import useLocale from '@locale';
 import {
   ConflictException,
   ForbiddenException,
@@ -179,7 +180,8 @@ export class ClientsService {
       throw new NotFoundException(`Integração ${integrationKey} não está ativa`);
     }
 
-    await this.clientIntegrationRepository.polling(integration.id);
+    integration.lastPolling = useLocale();
+    await this.clientIntegrationRepository.save(integration);
   }
 
   async listIntegrations(data: ListIntegrationDto): Promise<ClientIntegrationResponse[]> {

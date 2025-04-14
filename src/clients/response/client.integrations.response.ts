@@ -11,13 +11,19 @@ class BaseClient extends OmitType(Client, ['integrations']) {
   photo?: string;
 }
 
+class IntegrationStatusResponse {
+  label: string;
+  timer: string;
+  value: IntegrationStatus;
+}
+
 class IntegrationResponse extends Integration {
   @Expose({ name: 'last_polling' })
   lastPolling: Date;
 
   errors: number;
 
-  status: IntegrationStatus;
+  status: IntegrationStatusResponse;
 }
 
 export class ClientIntegrationResponse extends BaseClient {
@@ -38,23 +44,25 @@ export class ClientIntegrationResponse extends BaseClient {
         hoursDiff = differenceInHours(now, lastPolling),
         daysDiff = differenceInDays(now, lastPolling);
 
-      let status: IntegrationStatus, label: string;
+      const status: IntegrationStatusResponse = {} as IntegrationStatusResponse;
 
       if (minutesDiff <= 30) {
-        status = IntegrationStatus.active;
-        label = `há ${minutesDiff} minutos`;
+        status.label = 'Ativo';
+        status.value = IntegrationStatus.active;
+        status.timer = `há ${minutesDiff || 1} minuto(s)`;
       } else if (minutesDiff <= 60) {
-        status = IntegrationStatus.stopped;
-        label = `há ${minutesDiff} minutos`;
+        status.label = 'Parado';
+        status.value = IntegrationStatus.stopped;
+        status.timer = `há ${minutesDiff} minuto(s)`;
       } else {
-        status = IntegrationStatus.critic;
-        label = daysDiff ? `há ${daysDiff} dias` : `há ${hoursDiff} horas`;
+        status.label = 'Crítico';
+        status.value = IntegrationStatus.critic;
+        status.timer = daysDiff ? `há ${daysDiff} dia(s)` : `há ${hoursDiff} hora(s)`;
       }
 
       return {
         ...integration,
         errors,
-        label,
         status,
         lastPolling,
       };
