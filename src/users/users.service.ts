@@ -6,7 +6,9 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Payload } from 'src/jwt/jwt.dto';
 import { Not, Repository } from 'typeorm';
 
-import { CreateUserDto } from './users.dtos';
+import { CreateUserDto } from './dtos/create-user.dto';
+import { FindUserDto } from './dtos/find-user.dto';
+import { UpdateUserDto } from './dtos/update-user.dto';
 
 @Injectable()
 export class UsersService {
@@ -21,7 +23,9 @@ export class UsersService {
     return !!deviceId && !!deviceAuthorized && deviceAuthorized == deviceId;
   }
 
-  async findByEmail(email: string): Promise<User | null> {
+  async find(data: FindUserDto): Promise<User | null> {
+    const { email } = data;
+
     return await this.repository.findOne({
       where: { email },
       relations: ['client'],
@@ -29,7 +33,9 @@ export class UsersService {
   }
 
   async createAdmin(data: CreateUserDto): Promise<User> {
-    let register = await this.findByEmail(data.email);
+    const { email } = data;
+
+    let register = await this.find({ email });
 
     if (register) {
       throw new ConflictException(`O e-mail ${register.email} já existe`);
@@ -44,10 +50,10 @@ export class UsersService {
   async create(data: CreateUserDto, user: Payload): Promise<User> {
     const { email } = data;
 
-    let register = await this.findByEmail(email);
+    let register = await this.find({ email });
 
     if (register) {
-      throw new ConflictException(`O e-mail ${register.email} já existe`);
+      throw new ConflictException(`O e-mail ${email} já existe`);
     }
 
     register = this.repository.create(data);
@@ -56,7 +62,7 @@ export class UsersService {
     return await this.repository.save(register);
   }
 
-  async update(id: number, data: CreateUserDto): Promise<User> {
+  async update(id: number, data: UpdateUserDto): Promise<User> {
     const { email } = data;
 
     const register = await this.repository.findOneBy({ id });

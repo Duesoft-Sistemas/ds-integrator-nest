@@ -30,3 +30,9 @@ export class CreateClientDto {
   @IsNotEmpty()
   email: string;
 }
+
+export class CreateClientWithPasswordDto extends CreateClientDto {
+  @IsString()
+  @IsNotEmpty()
+  password: string;
+}

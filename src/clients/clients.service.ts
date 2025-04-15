@@ -16,8 +16,9 @@ import { Payload } from 'src/jwt/jwt.dto';
 import { UserRepository } from 'src/users/users.repository';
 import { DataSource, Not } from 'typeorm';
 
-import { CreateClientDto } from './dtos/create-client.dto';
+import { CreateClientDto, CreateClientWithPasswordDto } from './dtos/create-client.dto';
 import { DeleteClientDto } from './dtos/delete-client.dto';
+import { FindClientDto } from './dtos/find-client.dto';
 import { IntegrationPollingDto } from './dtos/integration.polling.dto';
 import { ListIntegrationDto } from './dtos/list.integration.polling.dto';
 import { ListClientDto } from './dtos/list-client.dto';
@@ -25,6 +26,7 @@ import { UpdateClientDto } from './dtos/update-client.dto';
 import { ClientIntegrationRepository } from './repositories/client.integrations.repository';
 import { ClientRepository } from './repositories/clients.repository';
 import { ClientIntegrationResponse } from './response/client.integrations.response';
+import { ClientCreatedResponse } from './response/client-created.response';
 
 @Injectable()
 export class ClientsService {
@@ -36,7 +38,19 @@ export class ClientsService {
     private readonly clientIntegrationRepository: ClientIntegrationRepository,
   ) {}
 
-  async create(data: CreateClientDto, user: Payload): Promise<Client | { password: string }> {
+  async createWithPassword(
+    data: CreateClientWithPasswordDto,
+    user: Payload,
+  ): Promise<ClientCreatedResponse> {
+    const { password, ...rest } = data;
+    return this.create(rest, user, password);
+  }
+
+  async create(
+    data: CreateClientDto,
+    user: Payload,
+    password?: string,
+  ): Promise<ClientCreatedResponse> {
     let client = await this.repository.findByCnpj(data.cnpj);
 
     if (client) {
@@ -49,11 +63,11 @@ export class ClientsService {
       throw new ConflictException(`E-mail ${profile.email} já registrado`);
     }
 
-    const password = this.cryptoService.generatePassword();
-    const passwordEncrypted = await this.cryptoService.encrypt(password);
+    password = password || this.cryptoService.generatePassword();
+    // const passwordEncrypted = await this.cryptoService.encrypt(password);
 
     client = await this.repository.register(data, password, user);
-    return { ...client, password: passwordEncrypted };
+    return { ...client, password };
   }
 
   async update(id: number, data: UpdateClientDto): Promise<Partial<Client>> {
@@ -184,5 +198,12 @@ export class ClientsService {
   async listIntegrations(data: ListIntegrationDto): Promise<ClientIntegrationResponse[]> {
     const response = await this.repository.listIntegrations(data);
     return response.map((item) => new ClientIntegrationResponse(item));
+  }
+
+  async find(data: FindClientDto): Promise<Client | null> {
+    const { email } = data;
+
+    const register = await this.repository.findOneBy({ user: { email } });
+    return register;
   }
 }

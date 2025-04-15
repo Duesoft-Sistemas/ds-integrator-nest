@@ -13,7 +13,7 @@ import {
 } from '@nestjs/common';
 import { Request } from 'express';
 
-import { CreateUserAdminDto, CreateUserDto } from './users.dtos';
+import { CreateUserAdminDto, CreateUserDto } from './dtos/create-user.dto';
 import { UsersService } from './users.service';
 
 @Controller('users')

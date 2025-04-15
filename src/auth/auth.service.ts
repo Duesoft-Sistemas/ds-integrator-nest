@@ -17,7 +17,7 @@ export class AuthService {
   async signIn(data: SignInDto): Promise<LoginResponse> {
     const { email, password } = data;
 
-    const user = await this.usersService.findByEmail(email);
+    const user = await this.usersService.find({ email });
 
     if (!user || !(await bcrypt.compare(password, user.password))) {
       throw new UnauthorizedException('Credenciais inválidas');

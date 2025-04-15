@@ -1,13 +1,12 @@
-import { Integration } from '@entities/integration/integration.entity';
 import { Module } from '@nestjs/common';
-import { TypeOrmModule } from '@nestjs/typeorm';
+import { ConfigModule } from '@nestjs/config';
 
 import { IntegrationsController } from './integrations.controller';
 import { IntegrationsService } from './integrations.service';
 import { IntegrationRepository } from './repositories/integrations.repository';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Integration])],
+  imports: [ConfigModule],
   controllers: [IntegrationsController],
   providers: [IntegrationRepository, IntegrationsService],
   exports: [IntegrationsService],

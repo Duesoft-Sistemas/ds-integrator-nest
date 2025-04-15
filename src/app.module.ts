@@ -13,6 +13,7 @@ import { IntegrationHistoryModule } from './integration-history/integration-hist
 import { IntegrationMappingModule } from './integration-mapping/integration-mapping.module';
 import { IntegrationsModule } from './integrations/integrations.module';
 import { JwtModuleInternal } from './jwt/jwt.module';
+import { SeedModule } from './seed/seed.module';
 import { SelfCallService } from './self-call/self-call.service';
 import { UsersModule } from './users/users.module';
 
@@ -28,6 +29,7 @@ import { UsersModule } from './users/users.module';
     IntegrationHistoryModule,
     IntegrationMappingModule,
     IntegrationsModule,
+    SeedModule,
   ],
   controllers: [AppController],
   providers: [
