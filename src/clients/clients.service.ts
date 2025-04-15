@@ -162,19 +162,10 @@ export class ClientsService {
   async polling(data: IntegrationPollingDto): Promise<void> {
     const { clientId, integrationKey } = data;
 
-    const integration = await this.clientIntegrationRepository
-      .createQueryBuilder('clientIntegration')
-      .leftJoin('clientIntegration.client', 'client')
-      .leftJoin('clientIntegration.integration', 'integration')
-      .where(
-        'client.is_active = :isActive AND clientIntegration.client_id = :clientId AND integration.key = :integrationKey',
-        {
-          clientId,
-          integrationKey,
-          isActive: true,
-        },
-      )
-      .getOne();
+    const integration = await this.clientIntegrationRepository.findOneBy({
+      client: { id: clientId, isActive: true },
+      integration: { key: integrationKey },
+    });
 
     if (!integration) {
       throw new NotFoundException(
