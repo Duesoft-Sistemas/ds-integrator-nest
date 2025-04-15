@@ -24,10 +24,11 @@ import { unlink } from 'fs/promises';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
 
-import { DeleteClientDto, ListClientDto } from './clients.dtos';
 import { ClientsService } from './clients.service';
 import { CreateClientDto } from './dtos/create-client.dto';
+import { DeleteClientDto } from './dtos/delete-client.dto';
 import { ListIntegrationDto } from './dtos/list.integration.polling.dto';
+import { ListClientDto } from './dtos/list-client.dto';
 import { UpdateClientDto } from './dtos/update-client.dto';
 
 @Controller('clients')

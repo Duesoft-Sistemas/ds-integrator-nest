@@ -1,11 +1,5 @@
 import { Expose, Transform } from 'class-transformer';
-import { IsBoolean, IsInt, IsOptional, IsString } from 'class-validator';
-
-export class DeleteClientDto {
-  @Transform(({ value }) => Number.parseInt(value))
-  @IsInt()
-  id: number;
-}
+import { IsBoolean, IsOptional, IsString } from 'class-validator';
 
 export class ListClientDto {
   @Expose({ name: 'only_active' })

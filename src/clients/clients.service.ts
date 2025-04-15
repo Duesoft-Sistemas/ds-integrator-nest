@@ -2,8 +2,8 @@ import { ClientIntegrations } from '@entities/clients/client.integrations.entity
 import { Client } from '@entities/clients/clients.entity';
 import useLocale from '@locale';
 import {
+  BadRequestException,
   ConflictException,
-  ForbiddenException,
   Injectable,
   InternalServerErrorException,
   NotFoundException,
@@ -11,15 +11,16 @@ import {
 import { InjectDataSource } from '@nestjs/typeorm';
 import { instanceToPlain, plainToClass } from 'class-transformer';
 import * as _ from 'lodash';
-import { DeleteClientDto, ListClientDto } from 'src/clients/clients.dtos';
 import { CryptoService } from 'src/crypto/crypto.service';
 import { Payload } from 'src/jwt/jwt.dto';
 import { UserRepository } from 'src/users/users.repository';
 import { DataSource, Not } from 'typeorm';
 
 import { CreateClientDto } from './dtos/create-client.dto';
+import { DeleteClientDto } from './dtos/delete-client.dto';
 import { IntegrationPollingDto } from './dtos/integration.polling.dto';
 import { ListIntegrationDto } from './dtos/list.integration.polling.dto';
+import { ListClientDto } from './dtos/list-client.dto';
 import { UpdateClientDto } from './dtos/update-client.dto';
 import { ClientIntegrationRepository } from './repositories/client.integrations.repository';
 import { ClientRepository } from './repositories/clients.repository';
@@ -161,23 +162,28 @@ export class ClientsService {
   async polling(data: IntegrationPollingDto): Promise<void> {
     const { clientId, integrationKey } = data;
 
-    const client = await this.repository.findOne({
-      where: { id: clientId, integrations: { integration: { key: integrationKey } } },
-      relations: ['integrations', 'integrations.integration'],
-    });
+    const integration = await this.clientIntegrationRepository
+      .createQueryBuilder('clientIntegration')
+      .leftJoin('clientIntegration.client', 'client')
+      .leftJoin('clientIntegration.integration', 'integration')
+      .where(
+        'client.is_active = :isActive AND clientIntegration.client_id = :clientId AND integration.key = :integrationKey',
+        {
+          clientId,
+          integrationKey,
+          isActive: true,
+        },
+      )
+      .getOne();
 
-    if (!client) {
-      throw new NotFoundException('Cliente ou integração não encontrado');
+    if (!integration) {
+      throw new NotFoundException(
+        `Integração ${integrationKey} não encontrado para o cliente ID ${clientId}`,
+      );
     }
 
-    if (!client.isActive) {
-      throw new ForbiddenException('Cliente não está ativo');
-    }
-
-    const integration = client.integrations.find((item) => item.integration.key == integrationKey);
-
-    if (!integration || !integration.isActive) {
-      throw new NotFoundException(`Integração ${integrationKey} não está ativa`);
+    if (!integration.isActive) {
+      throw new BadRequestException(`Integração desativada`);
     }
 
     integration.lastPolling = useLocale();
