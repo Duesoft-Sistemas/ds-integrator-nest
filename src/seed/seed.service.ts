@@ -101,7 +101,7 @@ export class SeedService {
       await Promise.all(
         data.map(async (item) => {
           const register =
-            (await this.clientService.find({ email: item.email })) ??
+            (await this.clientService.find({ cnpj: item.cnpj })) ??
             (await this.clientService.createWithPassword(item, user));
 
           this.logger.log(`Cliente ${register.name} criado com sucesso!`);

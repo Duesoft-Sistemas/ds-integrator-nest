@@ -201,9 +201,9 @@ export class ClientsService {
   }
 
   async find(data: FindClientDto): Promise<Client | null> {
-    const { email } = data;
+    const { cnpj } = data;
 
-    const register = await this.repository.findOneBy({ user: { email } });
+    const register = await this.repository.findOneBy({ cnpj });
     return register;
   }
 }
