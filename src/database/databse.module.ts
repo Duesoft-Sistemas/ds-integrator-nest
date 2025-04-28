@@ -24,9 +24,7 @@ import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm';
             options.port = configService.get<number>('DATABASE_PORT');
             options.username = configService.get<string>('DATABASE_USERNAME');
             options.password = configService.get<string>('DATABASE_PASSWORD');
-            options.ssl = {
-              rejectUnauthorized: false,
-            };
+            options.ssl = false;
             break;
         }
 
