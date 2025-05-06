@@ -1,4 +1,3 @@
-/* eslint-disable prettier/prettier */
 import { Integration } from '@entities/integration/integration.entity';
 import { IntegrationKey } from '@entities/integration/integration.key.enum';
 import { User } from '@entities/users/users.entity';
@@ -81,21 +80,118 @@ export class SeedService {
     try {
       const integrationIds = integrations.map((r) => r.id);
       const data: CreateClientWithPasswordDto[] = [
-        { cnpj: '14444619000361', email: 'nayamyplussize@duesoft.com', name: 'Nayamy Plus Size', password: 'GkBRDqeRRbN3', integrations: integrationIds },
-        { cnpj: '46036378000146', email: 'dcgunshouse@duesoft.com', name: 'DC Guns House', password: 'fFB6f2hZLFNX', integrations: integrationIds },
-        { cnpj: '56560857000110', email: 'leledacuca@duesoft.com', name: 'Lele da cuca', password: 'A1JlgSLUmIH8', integrations: integrationIds },
-        { cnpj: '29685477000130', email: 'farmsrugs@duesoft.com', name: 'Farms Rugs', password: 'epVi1Gp4rG4t', integrations: integrationIds },
-        { cnpj: '34445466000112', email: 'forcaeluz@duesoft.com', name: 'Forca e Luz Solar', password: 'pgU9sLtReUIM', integrations: integrationIds },
-        { cnpj: '00670226000108', email: 'rifane@duesoft.com', name: 'Rifane', password: '9fHMZHoj6SOh', integrations: integrationIds },
-        { cnpj: '03255644000119', email: 'oklahoma@duesoft.com', name: 'Oklahoma Country Fashion', password: '6Z1Lr9mNrX0I', integrations: integrationIds },
-        { cnpj: '30435064000186', email: 'cantagallo@duesoft.com', name: 'Cantagallo', password: 'A4Tyq4BiuAZr', integrations: integrationIds },
-        { cnpj: '02373715000115', email: 'prudental@duesoft.com', name: 'Prudental', password: 'YC4IO8D6lBqMqXwn', integrations: integrationIds },
-        { cnpj: '45844254000124', email: 'rvtech@duesoft.com', name: 'RV Tech', password: 'fgMeK9bDtEOEinoy', integrations: integrationIds },
-        { cnpj: '00992787000115', email: 'mmdistribuidora@duesoft.com', name: 'M.M Distribuidora', password: 'WiQ4A+3erCiT4S14', integrations: integrationIds },
-        { cnpj: '58539800000165', email: 'autocar@duesoft.com', name: 'Autocar Distribuidora', password: 'eAcCWZfGpTmzgSAJ', integrations: integrationIds },
-        { cnpj: '55333363000130', email: 'papelariaprudentina@duesoft.com', name: 'Papelaria Prudentina', password: 'XyAqJfK/iTGAvD8h', integrations: integrationIds },
-        { cnpj: '02956576000152', email: 'prudenflex@duesoft.com', name: 'Prudenflex', password: 'cTk4JvC5lUmtoxIK', integrations: integrationIds },
-        { cnpj: '02253710000159', email: 'microtec@duesoft.com', name: 'Microtec', password: 'W3sUWMa+nhOynHI7', integrations: integrationIds },
+        {
+          cnpj: '14444619000361',
+          email: 'nayamyplussize@duesoft.com',
+          name: 'Nayamy Plus Size',
+          password: 'GkBRDqeRRbN3',
+          integrations: integrationIds,
+        },
+        {
+          cnpj: '46036378000146',
+          email: 'dcgunshouse@duesoft.com',
+          name: 'DC Guns House',
+          password: 'fFB6f2hZLFNX',
+          integrations: integrationIds,
+        },
+        {
+          cnpj: '56560857000110',
+          email: 'leledacuca@duesoft.com',
+          name: 'Lele da cuca',
+          password: 'A1JlgSLUmIH8',
+          integrations: integrationIds,
+        },
+        {
+          cnpj: '29685477000130',
+          email: 'farmsrugs@duesoft.com',
+          name: 'Farms Rugs',
+          password: 'epVi1Gp4rG4t',
+          integrations: integrationIds,
+        },
+        {
+          cnpj: '34445466000112',
+          email: 'forcaeluz@duesoft.com',
+          name: 'Forca e Luz Solar',
+          password: 'pgU9sLtReUIM',
+          integrations: integrationIds,
+        },
+        {
+          cnpj: '00670226000108',
+          email: 'rifane@duesoft.com',
+          name: 'Rifane',
+          password: '9fHMZHoj6SOh',
+          integrations: integrationIds,
+        },
+        {
+          cnpj: '03255644000119',
+          email: 'oklahoma@duesoft.com',
+          name: 'Oklahoma Country Fashion',
+          password: '6Z1Lr9mNrX0I',
+          integrations: integrationIds,
+        },
+        {
+          cnpj: '30435064000186',
+          email: 'cantagallo@duesoft.com',
+          name: 'Cantagallo',
+          password: 'A4Tyq4BiuAZr',
+          integrations: integrationIds,
+        },
+        {
+          cnpj: '02373715000115',
+          email: 'prudental@duesoft.com',
+          name: 'Prudental',
+          password: 'YC4IO8D6lBqMqXwn',
+          integrations: integrationIds,
+        },
+        {
+          cnpj: '45844254000124',
+          email: 'rvtech@duesoft.com',
+          name: 'RV Tech',
+          password: 'fgMeK9bDtEOEinoy',
+          integrations: integrationIds,
+        },
+        {
+          cnpj: '00992787000115',
+          email: 'mmdistribuidora@duesoft.com',
+          name: 'M.M Distribuidora',
+          password: 'WiQ4A+3erCiT4S14',
+          integrations: integrationIds,
+        },
+        {
+          cnpj: '58539800000165',
+          email: 'autocar@duesoft.com',
+          name: 'Autocar Distribuidora',
+          password: 'eAcCWZfGpTmzgSAJ',
+          integrations: integrationIds,
+        },
+        {
+          cnpj: '55333363000130',
+          email: 'papelariaprudentina@duesoft.com',
+          name: 'Papelaria Prudentina',
+          password: 'XyAqJfK/iTGAvD8h',
+          integrations: integrationIds,
+        },
+        {
+          cnpj: '02956576000152',
+          email: 'prudenflex@duesoft.com',
+          name: 'Prudenflex',
+          password: 'cTk4JvC5lUmtoxIK',
+          integrations: integrationIds,
+        },
+        {
+          cnpj: '02253710000159',
+          email: 'microtec@duesoft.com',
+          name: 'Microtec',
+          password: 'W3sUWMa+nhOynHI7',
+          integrations: integrationIds,
+        },
+        {
+          cnpj: '23194208000194',
+          email: 'bmauto@duesoft.com.br',
+          name: 'BM Auto Peças',
+          password: '4hmFSPJFpvlV',
+          integrations: integrationIds,
+        },
       ];
 
       await Promise.all(
