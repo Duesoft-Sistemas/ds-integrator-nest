@@ -7,4 +7,7 @@ export enum IntegrationHistoryEntity {
   brand = 'PRODUCT_BRAND',
   order = 'ORDER',
   store = 'STORE',
+  itemsPriceList = 'ITEMS_PRICE_LIST',
+  commercialTableItens = 'COMMERCIAL_TABLE_ITENS',
+  promotionalTableItens = 'PROMOTIONAL_TABLE_ITENS',
 }
