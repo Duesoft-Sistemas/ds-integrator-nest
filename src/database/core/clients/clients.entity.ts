@@ -25,6 +25,6 @@ export class Client extends BaseSchema {
   @JoinColumn({ name: 'profile_id' })
   profile: User;
 
-  @OneToMany(() => ClientIntegrations, (entity) => entity.client, { cascade: true })
+  @OneToMany(() => ClientIntegrations, (entity) => entity.client)
   integrations: ClientIntegrations[];
 }

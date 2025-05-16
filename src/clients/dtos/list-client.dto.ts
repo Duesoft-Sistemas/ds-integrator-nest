@@ -2,7 +2,7 @@ import { Expose, Transform } from 'class-transformer';
 import { IsBoolean, IsOptional, IsString } from 'class-validator';
 
 export class ListClientDto {
-  @Expose({ name: 'only_active' })
+  @Expose({ name: 'status' })
   @Transform(({ value }) => value === 'true')
   @IsBoolean()
   @IsOptional()
@@ -11,4 +11,9 @@ export class ListClientDto {
   @IsString()
   @IsOptional()
   name?: string;
+
+  @Transform(({ value }: { value?: string }) => value?.replace(/\D/g, ''))
+  @IsString()
+  @IsOptional()
+  cnpj?: string;
 }

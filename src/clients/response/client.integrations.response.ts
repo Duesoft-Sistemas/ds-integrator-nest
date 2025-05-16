@@ -38,7 +38,7 @@ export class ClientIntegrationResponse extends BaseClient {
 
     Object.assign(this, { ...client, photo: profile.photo });
 
-    this.integrations = integrations.map(({ integration, lastPolling, errors = 0 }) => {
+    this.integrations = integrations.map(({ integration, lastPolling, errors = 0, ...rest }) => {
       const now = useLocale();
       const minutesDiff = differenceInMinutes(now, lastPolling),
         hoursDiff = differenceInHours(now, lastPolling),
@@ -62,6 +62,7 @@ export class ClientIntegrationResponse extends BaseClient {
 
       return {
         ...integration,
+        ...rest,
         errors,
         status,
         lastPolling,

@@ -23,7 +23,10 @@ export class ClientIntegrations extends BaseSchema {
   @Column({ name: 'integration_id' })
   integrationId: number;
 
-  @ManyToOne(() => Integration, (entity) => entity.clientIntegrations, { onDelete: 'CASCADE' })
+  @ManyToOne(() => Integration, (entity) => entity.clientIntegrations, {
+    cascade: true,
+    onDelete: 'CASCADE',
+  })
   @JoinColumn({ name: 'integration_id' })
   integration: Integration;
 

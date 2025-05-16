@@ -1,5 +1,6 @@
 import { ClientIntegrations } from '@entities/clients/client.integrations.entity';
 import { Client } from '@entities/clients/clients.entity';
+import { User } from '@entities/users/users.entity';
 import useLocale from '@locale';
 import {
   BadRequestException,
@@ -9,8 +10,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectDataSource } from '@nestjs/typeorm';
-import { instanceToPlain, plainToClass } from 'class-transformer';
-import * as _ from 'lodash';
+import { instanceToPlain } from 'class-transformer';
 import { CryptoService } from 'src/crypto/crypto.service';
 import { Payload } from 'src/jwt/jwt.dto';
 import { UserRepository } from 'src/users/users.repository';
@@ -71,7 +71,7 @@ export class ClientsService {
   }
 
   async update(id: number, data: UpdateClientDto): Promise<Partial<Client>> {
-    const { integrations: integrationIds = [] } = data;
+    const { integrations: integrationIds = [], ...clientData } = data;
 
     let client: Client | null;
 
@@ -96,31 +96,45 @@ export class ClientsService {
     await queryRunner.startTransaction();
 
     try {
-      Object.keys(data).forEach((key) => {
-        if (data[key]) {
+      Object.keys(clientData).forEach((key) => {
+        const value = clientData[key];
+
+        if (value) {
           if (Object.prototype.hasOwnProperty.call(client, key)) {
-            client[key] = data[key];
+            client[key] = value;
           }
 
           if (Object.prototype.hasOwnProperty.call(client.profile, key)) {
-            client.profile[key] = data[key];
+            client.profile[key] = value;
           }
         }
       });
 
-      if (integrationIds.length > 0) {
-        await queryRunner.manager.delete(ClientIntegrations, client.integrations);
+      const integrationToDelete = client.integrations.filter(
+        (r) => !integrationIds.includes(r.integrationId),
+      );
 
-        client.integrations = integrationIds.map((integrationId) => ({
-          integrationId,
-        })) as ClientIntegrations[];
+      if (integrationToDelete.length) {
+        await queryRunner.manager.delete(ClientIntegrations, integrationToDelete);
       }
 
-      await queryRunner.manager.save(client);
-      await queryRunner.manager.save(client.profile);
+      client.integrations = integrationIds.map((integrationId) => {
+        const clientIntegration =
+          client.integrations.find((r) => r.integrationId === integrationId) ??
+          new ClientIntegrations();
 
+        clientIntegration.clientId = client.id;
+        clientIntegration.integrationId = integrationId;
+
+        return clientIntegration;
+      });
+
+      await queryRunner.manager.save(Client, client);
+      await queryRunner.manager.save(User, client.profile);
+      await queryRunner.manager.save(ClientIntegrations, client.integrations);
       await queryRunner.commitTransaction();
-      return plainToClass(Client, _.omit(client, 'profile', 'integrations'));
+
+      return client;
     } catch (ex) {
       await queryRunner.rollbackTransaction();
 
@@ -158,9 +172,7 @@ export class ClientsService {
     } catch (ex) {
       await queryRunner.rollbackTransaction();
 
-      throw new InternalServerErrorException(
-        `Falha ao cadastrar cliente. ${(ex as Error).message}`,
-      );
+      throw new InternalServerErrorException(`Falha ao excluir cliente. ${(ex as Error).message}`);
     } finally {
       await queryRunner.release();
     }
@@ -176,9 +188,12 @@ export class ClientsService {
   async polling(data: IntegrationPollingDto): Promise<void> {
     const { clientId, integrationKey } = data;
 
-    const integration = await this.clientIntegrationRepository.findOneBy({
-      client: { id: clientId, isActive: true },
-      integration: { key: integrationKey },
+    const integration = await this.clientIntegrationRepository.findOne({
+      where: {
+        client: { id: clientId, isActive: true },
+        integration: { key: integrationKey },
+      },
+      relations: ['client', 'integration'],
     });
 
     if (!integration) {

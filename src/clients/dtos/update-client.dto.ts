@@ -1,3 +1,4 @@
+import { Transform } from 'class-transformer';
 import { IsArray, IsEmail, IsOptional, IsString, Matches } from 'class-validator';
 
 export class UpdateClientDto {
@@ -14,11 +15,12 @@ export class UpdateClientDto {
   @IsOptional()
   cnpj: string;
 
+  @Transform(({ value }: { value?: string }) => (value ? (JSON.parse(value) as number[]) : []))
   @IsArray()
   @IsOptional()
-  integrations: number[];
+  integrations?: number[];
 
   @IsEmail()
   @IsOptional()
-  email: string;
+  email?: string;
 }
