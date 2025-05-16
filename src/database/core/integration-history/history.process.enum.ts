@@ -10,4 +10,7 @@ export enum IntegrationHistoryEntity {
   itemsPriceList = 'ITEMS_PRICE_LIST',
   commercialTableItens = 'COMMERCIAL_TABLE_ITENS',
   promotionalTableItens = 'PROMOTIONAL_TABLE_ITENS',
+  user = 'USER',
+  seller = 'SELLER',
+  accessProfile = 'ACCESS_PROFILE',
 }
