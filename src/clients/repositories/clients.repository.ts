@@ -97,6 +97,8 @@ export class ClientRepository extends Repository<Client> {
       })) as ClientIntegrations[];
 
       await queryRunner.manager.save(client);
+      await queryRunner.manager.save(client.integrations);
+
       await queryRunner.commitTransaction();
 
       return client;
