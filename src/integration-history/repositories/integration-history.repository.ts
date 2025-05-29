@@ -25,7 +25,7 @@ export class IntegrationHistoryRepository extends Repository<IntegrationHistory>
     }
 
     if (integrationId) {
-      wheres.push(`clientIntegration.integration_id = ${integrationId}`);
+      wheres.push(`clientIntegration.id = ${integrationId}`);
     }
 
     if (dateStart) {
